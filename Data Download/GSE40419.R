@@ -25,7 +25,7 @@ library(GEOquery)
 
 
 
-
+#下载数据
 if (!file.exists("GSE40419_eSet.Rdata")) {
   
   GEO_file <- getGEO('GSE40419',#需要下载的series
