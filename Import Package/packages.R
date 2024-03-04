@@ -42,6 +42,10 @@ loadPackagesFunction <- function(){
     
     install.packages("nnet")
   
+  if(!requireNamespace("glmnet",quietly = T))
+    
+    install.packages("glmnet")
+  
   
   
   
@@ -65,6 +69,6 @@ loadPackagesFunction <- function(){
   
   library(nnet)
   
-  
+  library(glmnet)
   
 }

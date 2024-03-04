@@ -1,7 +1,7 @@
 
 #数据处理
 
-dataProcessingFunction <- function(dataset_name,exp,plate,clinical,result_col_name,symbol_col_name){
+DataProcessingFunction <- function(dataset_name,exp,plate,clinical,result_col_name,symbol_col_name){
   
   exp <- as.data.frame(exp)
   

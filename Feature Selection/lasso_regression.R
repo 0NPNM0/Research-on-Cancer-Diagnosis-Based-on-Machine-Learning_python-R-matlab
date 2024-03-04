@@ -1,9 +1,9 @@
 
 #使用Lasso回归进行特征选择
 
-lassoRegressionFeatureSelectionFunction <- function(dataset_length,select_feature_number){
-  y <- as.matrix(dap[,1])#因变量
-  x <- as.matrix(dap[,2:dataset_length])#自变量
+LassoRegressionFeatureSelectionFunction <- function(dataset_length,select_feature_number){
+  y <- as.matrix(dap[,2])#因变量
+  x <- as.matrix(dap[,3:dataset_length])#自变量
   
   set.seed(12345)#保持结果不变
   lasso_model <- glmnet(x,
@@ -12,7 +12,7 @@ lassoRegressionFeatureSelectionFunction <- function(dataset_length,select_featur
                         alpha = 1#采用L1正则化
   )
   
-  print(lasso_model) #DF:选择的自变量个数
+  #print(lasso_model) #DF:选择的自变量个数
   #%Dev:拟合优度，越接近1越好
   #Lambda:正则化参数，通过交叉验证来选取
   
@@ -58,5 +58,5 @@ lassoRegressionFeatureSelectionFunction <- function(dataset_length,select_featur
   lasso_data <- cbind(dap$results, lasso_data)
   colnames(lasso_data)[1] <- "results"
   
-  return(return_list)
+  return(lasso_data)
 }

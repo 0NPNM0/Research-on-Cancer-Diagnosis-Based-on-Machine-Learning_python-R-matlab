@@ -19,7 +19,7 @@ ANNModel <- function(lasso_data, split_number){
   threshold <- 0.5
   train_predictions <- predict(model_ANN, train_data, type = "raw")
   train_predictions_ann <- as.factor(ifelse(train_predictions >= threshold, 1, 0))
-  print(train_predictions_ann)
+  
   # 查看模型预测准确率
   mean(train_data[,1] == train_predictions_ann)
   
@@ -44,7 +44,7 @@ ANNModel <- function(lasso_data, split_number){
   # 在测试集上进行预测
   test_predictions <- predict(model_ANN, test_data, type = "class")
   test_predictions_ann <- as.factor(ifelse(test_predictions >= threshold, 1, 0))
-  print(test_predictions_ann)
+  
   # 查看模型预测准确率
   mean(test_data[,1] == test_predictions_ann)
   
@@ -71,20 +71,5 @@ ANNModel <- function(lasso_data, split_number){
   confusion_matrix <- table(actual = test_data[,1], test_predictions_ann)
   
   
-  # 计算准确率
-  accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
-
-  # 计算精确率
-  precision <- diag(confusion_matrix) / colSums(confusion_matrix)
-
-  # 计算特异度
-  special <- diag(confusion_matrix)[2] / sum(confusion_matrix[, 2])
-
-  # 计算召回率
-  recall <- diag(confusion_matrix) / rowSums(confusion_matrix)
-
-  
-  return_sets <- list(plot_train = plot_train, plot_test = plot_test, accuracy = accuracy, precision = precision, special = special, recall = recall)
-  
-  return(return_sets)
+  return(confusion_matrix)
 }

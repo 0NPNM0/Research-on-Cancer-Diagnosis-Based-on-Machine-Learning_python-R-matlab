@@ -1,7 +1,7 @@
 
 #数据加载
 
-dataLoadFunction <- function(param){
+DataLoadFunction <- function(param){
   
   
   filename <- paste("GSE", param, "_eSet.Rdata", sep = "")#sep:无空格
