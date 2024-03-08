@@ -16,65 +16,76 @@ ElasticNetModel <- function(lasso_data, split_number){
   train_results <- as.numeric(as.character(train_data$results))
   test_results <- as.numeric(as.character(test_data$results))
   
-  # 构建Elastic-Net惩罚逻辑回归模型
-  model_Elastic_Net <- cv.glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0.5, standardize = TRUE, type.measure = "class")
+  library(nnet)
+  library(pROC)
   
-  # 在训练集上进行预测
-  train_predictions <- predict(model_Elastic_Net, newx = train_matrix, type = "response")
-  threshold <- 0.5
-  train_predictions_Elastic_Net <- as.factor(ifelse(train_predictions >= threshold, 1, 0))
+  final_confusion_matrix <- matrix(0, nrow = 2, ncol = 2)
   
-  # 查看模型预测准确率
-  mean(train_data[,1] == train_predictions_Elastic_Net)
+  for(i in 1:500){#重复500次
+    
+    # 构建Elastic-Net惩罚逻辑回归模型
+    model_Elastic_Net <- cv.glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0.5, standardize = TRUE, type.measure = "class")
+    print(coef(model_Elastic_Net))
+    
+    # 在训练集上进行预测
+    train_predictions <- predict(model_Elastic_Net, newx = train_matrix, type = "response")
+    threshold <- 0.5
+    train_predictions_Elastic_Net <- as.factor(ifelse(train_predictions >= threshold, 1, 0))
+    
+    # 查看模型预测准确率
+    mean(train_data[,1] == train_predictions_Elastic_Net)
+    
+    # 查看混淆矩阵
+    table(actual = train_data[,1], train_predictions_Elastic_Net)
+    
+    # 获取模型预测概率
+    prob_Elastic_Net <- predict(model_Elastic_Net, newx = train_matrix, type = "class")
+    ROC <- roc(response = train_results, predictor = as.numeric(prob_Elastic_Net))
+    
+    # 绘制ROC曲线
+    plot(ROC,
+         legacy.axes = TRUE,
+         main = "Elastic-Net train ROC curve",
+         type = "l",
+         col = "red",
+         lty = 1,
+         print.auc = TRUE,
+         thresholders = "best",
+         print.thres = "best"
+    )
+    
+    # 在测试集上进行预测
+    test_predictions <- predict(model_Elastic_Net, newx = test_matrix, type = "response")
+    test_predictions_Elastic_Net <- as.factor(ifelse(test_predictions >= threshold, 1, 0))
+    
+    # 查看模型预测准确率
+    mean(test_data[,1] == test_predictions_Elastic_Net)
+    
+    # 查看混淆矩阵
+    table(actual = test_data[,1], test_predictions_Elastic_Net)
+    
+    # 获取模型预测概率
+    prob_Elastic_Net <- predict(model_Elastic_Net, newx = test_matrix, type = "class")
+    ROC <- roc(response = test_results, predictor = as.numeric(prob_Elastic_Net))
+    
+    # 绘制ROC曲线
+    plot(ROC,
+         legacy.axes = TRUE,
+         main = "Elastic-Net test ROC curve",
+         type = "l",
+         col = "red",
+         lty = 1,
+         print.auc = TRUE,
+         thresholders = "best",
+         print.thres = "best"
+    )
+    
+    # 合并混淆矩阵
+    final_confusion_matrix <- final_confusion_matrix + table(actual = test_data[,1], test_predictions_Elastic_Net)
+    
+  }
   
-  # 查看混淆矩阵
-  table(actual = train_data[,1], train_predictions_Elastic_Net)
   
-  # 获取模型预测概率
-  prob_Elastic_Net <- predict(model_Elastic_Net, newx = train_matrix, type = "class")
-  ROC <- roc(response = train_results, predictor = as.numeric(prob_Elastic_Net))
-  
-  # 绘制ROC曲线
-  plot(ROC,
-       legacy.axes = TRUE,
-       main = "Elastic-Net train ROC curve",
-       type = "l",
-       col = "red",
-       lty = 1,
-       print.auc = TRUE,
-       thresholders = "best",
-       print.thres = "best"
-  )
-  
-  # 在测试集上进行预测
-  test_predictions <- predict(model_Elastic_Net, newx = test_matrix, type = "response")
-  test_predictions_Elastic_Net <- as.factor(ifelse(test_predictions >= threshold, 1, 0))
-  
-  # 查看模型预测准确率
-  mean(test_data[,1] == test_predictions_Elastic_Net)
-  
-  # 查看混淆矩阵
-  table(actual = test_data[,1], test_predictions_Elastic_Net)
-  
-  # 获取模型预测概率
-  prob_Elastic_Net <- predict(model_Elastic_Net, newx = test_matrix, type = "class")
-  ROC <- roc(response = test_results, predictor = as.numeric(prob_Elastic_Net))
-  
-  # 绘制ROC曲线
-  plot(ROC,
-       legacy.axes = TRUE,
-       main = "Elastic-Net test ROC curve",
-       type = "l",
-       col = "red",
-       lty = 1,
-       print.auc = TRUE,
-       thresholders = "best",
-       print.thres = "best"
-  )
-  
-  # 计算混淆矩阵
-  confusion_matrix <- table(actual = test_data[,1], test_predictions_Elastic_Net)
-  
-  return(confusion_matrix)
+  return(final_confusion_matrix)
   
 }

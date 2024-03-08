@@ -1,7 +1,7 @@
 
-#Ridge惩罚逻辑回归拟合模型
+#Lasso惩罚逻辑回归拟合模型（二元分类
 
-RidgeModel <- function(lasso_data, split_number){
+LassoBinaryModel <- function(lasso_data, split_number){
   
   #将数据集分成训练集和测试集
   set.seed(12345) #保证每次跑的结果都一样
@@ -9,15 +9,14 @@ RidgeModel <- function(lasso_data, split_number){
   train_data <- lasso_data[train_index, ]
   test_data <- lasso_data[-train_index, ]
   
-  
   # 将数据转换为矩阵形式
   train_matrix <- as.matrix(train_data[, -1])  # 去除目标变量列
+  
   test_matrix <- as.matrix(test_data[, -1])  # 去除目标变量列
   
   # 将目标变量转换为numeric
   train_results <- as.numeric(as.character(train_data$results))
   test_results <- as.numeric(as.character(test_data$results))
-  
   
   library(nnet)
   library(pROC)
@@ -26,29 +25,28 @@ RidgeModel <- function(lasso_data, split_number){
   
   for(i in 1:500){#重复500次
     
-    # 构建Ridge惩罚逻辑回归模型
-    model_ridge <- cv.glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
-    print(coef(model_ridge))
+    # 构建Lasso惩罚逻辑回归模型
+    model_lasso <- cv.glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
+    print(coef(model_lasso))
     
     # 在训练集上进行预测
-    train_predictions <- predict(model_ridge, newx = train_matrix, type = "response")
+    train_predictions <- predict(model_lasso, newx = train_matrix, type = "response")
+    train_predictions
     threshold <- 0.5
-    train_predictions_ridge <- as.factor(ifelse(train_predictions >= threshold, 1, 0))
+    train_predictions_lasso <- as.factor(ifelse(train_predictions >= threshold, 1, 0))
     
     # 查看模型预测准确率
-    mean(train_data[,1] == train_predictions_ridge)
-    
+    mean(train_data[,1] == train_predictions_lasso)
     # 查看混淆矩阵
-    table(actual = train_data[,1], train_predictions_ridge)
+    table(actual = train_data[,1], train_predictions_lasso)
     
     # 获取模型预测概率
-    prob_ridge <- predict(model_ridge, newx = train_matrix, type = "class")
-    ROC <- roc(response = train_results, predictor = as.numeric(prob_ridge))
-    
+    prob_lasso <- predict(model_lasso, newx = train_matrix, type = "class")
+    ROC <- roc(response = train_results, predictor = as.numeric(prob_lasso))
     # 绘制ROC曲线
     plot(ROC,
          legacy.axes = TRUE,
-         main = "Ridge train ROC curve",
+         main = "Lasso train ROC curve",
          type = "l",
          col = "red",
          lty = 1,
@@ -57,24 +55,25 @@ RidgeModel <- function(lasso_data, split_number){
          print.thres = "best"
     )
     
+    
+    
     # 在测试集上进行预测
-    test_predictions <- predict(model_ridge, newx = test_matrix, type = "response")
-    test_predictions_ridge <- as.factor(ifelse(test_predictions >= threshold, 1, 0))
+    test_predictions <- predict(model_lasso, newx = test_matrix, type = "response")
+    
+    threshold <- 0.5
+    test_predictions_lasso <- as.factor(ifelse(test_predictions >= threshold, 1, 0))
     
     # 查看模型预测准确率
-    mean(test_data[,1] == test_predictions_ridge)
-    
+    mean(test_data[,1] == test_predictions_lasso)
     # 查看混淆矩阵
-    table(actual = test_data[,1], test_predictions_ridge)
-    
+    table(actual = test_data[,1], test_predictions_lasso)
     # 获取模型预测概率
-    prob_ridge <- predict(model_ridge, newx = test_matrix, type = "class")
-    ROC <- roc(response = test_results, predictor = as.numeric(prob_ridge))
-    
+    prob_lasso <- predict(model_lasso, newx = test_matrix, type = "class")
+    ROC <- roc(response = test_results, predictor = as.numeric(prob_lasso))
     # 绘制ROC曲线
     plot(ROC,
          legacy.axes = TRUE,
-         main = "Ridge test ROC curve",
+         main = "Lasso test ROC curve",
          type = "l",
          col = "red",
          lty = 1,
@@ -85,9 +84,10 @@ RidgeModel <- function(lasso_data, split_number){
     
     
     # 合并混淆矩阵
-    final_confusion_matrix <- final_confusion_matrix + table(actual = test_data[,1], test_predictions_ridge)
-    
+    final_confusion_matrix <- final_confusion_matrix + table(actual = test_data[,1], test_predictions_lasso)
   }
+  
+  
   
   return(final_confusion_matrix)
   

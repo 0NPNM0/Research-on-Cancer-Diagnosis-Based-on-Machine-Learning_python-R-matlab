@@ -1,7 +1,9 @@
 
 #评估(当前仅包含对测试数据的评估)
 
-EvaluationFunction <- function(confusion_matrix){
+EvaluationFunction <- function(final_confusion_matrix){
+  
+  confusion_matrix <- final_confusion_matrix / 500
   
   # 计算准确率
   accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)

@@ -3,10 +3,10 @@
 
 DataLoadFunction <- function(param){
   
-  
   filename <- paste("GSE", param, "_eSet.Rdata", sep = "")#sep:无空格
   load(filename)#将更改好格式并保存好的的数据加载到这里
   
+  library(Biobase)
   
   GEO_file[[1]]#提取GEO_file中第一个数据
   

@@ -46,6 +46,10 @@ loadPackagesFunction <- function(){
     
     install.packages("glmnet")
   
+  if(!requireNamespace("skimr",quietly = T))
+    
+    install.packages("skimr")
+  
   
   
   
@@ -70,5 +74,7 @@ loadPackagesFunction <- function(){
   library(nnet)
   
   library(glmnet)
+  
+  library(skimr)
   
 }
