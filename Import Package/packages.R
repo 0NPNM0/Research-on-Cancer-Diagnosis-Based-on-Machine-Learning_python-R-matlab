@@ -50,6 +50,14 @@ loadPackagesFunction <- function(){
     
     install.packages("skimr")
   
+  if(!requireNamespace("smotefamily",quietly = T))
+    
+    install.packages("smotefamily")
+  
+  if(!requireNamespace("rgl",quietly = T))
+    
+    install.packages("rgl")
+  
   
   
   
@@ -76,5 +84,9 @@ loadPackagesFunction <- function(){
   library(glmnet)
   
   library(skimr)
+  
+  library(smotefamily)
+  
+  library(rgl)
   
 }

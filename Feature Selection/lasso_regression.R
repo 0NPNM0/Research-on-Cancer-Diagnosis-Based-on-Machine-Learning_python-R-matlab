@@ -1,9 +1,10 @@
 
 #使用Lasso回归进行特征选择(用于多元分类)
 
-LassoRegressionFunction <- function(dataset_length,select_feature_number){
-  y <- as.numeric(dap[,2])#因变量
-  x <- as.matrix(dap[,3:dataset_length])#自变量
+LassoRegressionFunction <- function(dataset, dataset_length,select_feature_number){
+  
+  y <- as.numeric(dataset[,2])#因变量
+  x <- as.matrix(dataset[,3:dataset_length])#自变量
   
   set.seed(12345)#保持结果不变
   library(glmnet)
@@ -32,8 +33,8 @@ LassoRegressionFunction <- function(dataset_length,select_feature_number){
   nonzero_vars <- nonzero_vars[2:select_feature_number]#去除第一个无关的变量
   nonzero_vars
   
-  lasso_data <- dap[,nonzero_vars]
-  lasso_data <- cbind(dap$results, lasso_data)
+  lasso_data <- dataset[,nonzero_vars]
+  lasso_data <- cbind(dataset$results, lasso_data)
   colnames(lasso_data)[1] <- "results"
   
   return(lasso_data)

@@ -12,6 +12,9 @@ source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Model
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Ridge.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Elastic_net.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Evaluation\\Evaluation.R")
+source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Plots\\pca_3d.R")
+source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Data Synthesis\\SMOTE.R")
+
 
 # 2.导入相关的包
 loadPackagesFunction
@@ -54,14 +57,39 @@ for (i in seq_along(dap$results)) {
 }
 
 table(dap$results)
-#dap <- dap[!dap$results==3,, drop=FALSE]#删除值为3的行(样本数量太少)
 
-# 6.使用Lasso回归进行特征选择
+# 6.数据合成
+return_data <- SMOTEFunction(dap)#使用smote算法合成数据
+data_all_1 <- return_data$class_data_1
+data_all_2 <- return_data$class_data_2
+data_all_3 <- return_data$class_data_3
+PCA3DFunction(data_all_1)#类别1合成前后图像比较
+PCA3DFunction(data_all_2)#类别2合成前后图像比较
+PCA3DFunction(data_all_3)#类别3合成前后图像比较
+
+
+# 7.使用Lasso回归进行特征选择
 dataset_length <- 17069
-select_feature_number <- 6#从2开始算第一个,这里参数含义是选到第几个
-lasso_data <- LassoRegressionFunction(dataset_length, select_feature_number)
+select_feature_number <- 50#从2开始算第一个,这里参数含义是选到第几个
+dataset <- rbind(data_all_1, data_all_2, data_all_3)
+lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number)
 
-# 7.训练模型,用测试数据进行评估
+data_for_class_1 <- lasso_data[lasso_data$results == 1, ]
+data_for_class_2 <- lasso_data[lasso_data$results == 2, ]
+data_for_class_3 <- lasso_data[lasso_data$results == 3, ]
+
+data_for_class_1_train <- rbind(data_for_class_1[1:180,],data_for_class_2[1:90,],data_for_class_3[1:90,])
+data_for_class_1_validate <- rbind(data_for_class_1[181:210,],data_for_class_2[91:105,],data_for_class_3[91:105,])
+
+data_for_class_2_train <- rbind(data_for_class_2[1:140,],data_for_class_1[1:70,],data_for_class_3[1:70,])
+data_for_class_2_validate <- rbind(data_for_class_2[141:170,],data_for_class_1[71:85,],data_for_class_3[71:85,])
+
+data_for_class_3_train <- rbind(data_for_class_3[1:140,],data_for_class_1[1:70,],data_for_class_2[1:70,])
+data_for_class_3_validate <- rbind(data_for_class_3[141:170,],data_for_class_1[71:85,],data_for_class_2[71:85,])
+
+data_for_class_test <- rbind(data_for_class_1[211:240,],data_for_class_2[171:200,],data_for_class_3[171:200,])
+  
+# 8.训练模型,用测试数据进行评估
 
 # （1）人工神经网络拟合模型
 split_number <- 0.3 #训练集:测试集 3:7
@@ -69,8 +97,13 @@ confusion_matrix_ann <- ANNMultiModel(lasso_data, split_number)
 EvaluationFunction(confusion_matrix_ann)
 
 # （2）Lasso惩罚逻辑回归拟合模型
-split_number <- 0.3 #训练集:测试集 3:7
-confusion_matrix_lasso <- LassoMultiModel(dap, split_number)
+confusion_matrix_lasso <- LassoMultiModel(data_for_class_1_train, 
+                                          data_for_class_1_validate,
+                                          data_for_class_2_train, 
+                                          data_for_class_2_validate,
+                                          data_for_class_3_train, 
+                                          data_for_class_3_validate,
+                                          data_for_class_test)
 EvaluationFunction(confusion_matrix_lasso)
 
 # （3）Ridge惩罚逻辑回归拟合模型
