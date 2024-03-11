@@ -10,109 +10,116 @@ LassoMultiModel <- function(data_for_class_1_train,
                             data_for_class_test){
   
   library(glmnet)
-  library(nnet)
-  library(pROC)
   
- 
   
-  #final_confusion_matrix <- matrix(0, nrow = 2, ncol = 2)
-  
-  mean_final <- 0.0000
+  mean_train <- 0.0000
+  mean_train_1 <- 0.0000
+  mean_train_2 <- 0.0000
+  mean_train_3 <- 0.0000
+  mean_validate_1 <- 0.0000
+  mean_validate_2 <- 0.0000
+  mean_validate_3 <- 0.0000
+  mean_test <- 0.0000
   
   for(i in 1:100){
-    #对1预测(0.8)
+    
+    #对1预测
     class_label <- 1
     
-    binary_data <- as.matrix(data_for_class_1_train[,-c(1)])
-    binary_test_data <- as.matrix(data_for_class_1_validate[,-c(1)])
+    binary_train_data <- as.matrix(data_for_class_1_train[,-c(1)])
+    binary_validate_data <- as.matrix(data_for_class_1_validate[,-c(1)])
     
-    binary_results <- as.numeric(as.character(ifelse(data_for_class_1_train$results == class_label, 1, 0)))
-    #table(binary_results)
-    binary_test_results <- as.numeric(as.character(ifelse(data_for_class_1_validate$results == class_label, 1, 0)))
-    #table(binary_test_results)
+    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_1_train$results == class_label, 1, 0)))
+    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_1_validate$results == class_label, 1, 0)))
   
-    model_lasso_1 <- cv.glmnet(x = binary_data, y = binary_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
+    model_lasso_1 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
     
-    train_predictions <- predict(model_lasso_1, newx = binary_test_data, type = "response")
-    #train_predictions
-    
+    #训练集预测概率
+    train_predictions <- predict(model_lasso_1, newx = binary_train_data, type = "response")
     results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
-    #results
     
-    # 查看模型预测准确率
+    # 查看模型在训练集上的预测准确率
+    print("train 1:")
+    print(mean(binary_train_results == results))
+    mean_train_1 <- mean_train_1 + mean(binary_train_results == results)
+    
+    
+    #验证集预测概率
+    validate_predictions <- predict(model_lasso_1, newx = binary_validate_data, type = "response")
+    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
+    
+    # 查看模型在验证集上的预测准确率
     print("validate 1:")
-    print(mean(binary_test_results == results))
-    # 查看混淆矩阵
-    #table(actual = binary_test_results, results)
-    
-    #binary_test_results
-    #results
-   
-    
+    print(mean(binary_validate_results == results))
+    mean_validate_1 <- mean_validate_1 + mean(binary_validate_results == results)
     
     
     
     #对2预测
     class_label <- 2
     
-    binary_data <- as.matrix(data_for_class_2_train[,-c(1)])
-    binary_test_data <- as.matrix(data_for_class_2_validate[,-c(1)])
+    binary_train_data <- as.matrix(data_for_class_2_train[,-c(1)])
+    binary_validate_data <- as.matrix(data_for_class_2_validate[,-c(1)])
     
-    binary_results <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
-    #table(binary_results)
-    binary_test_results <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
-    #table(binary_test_results)
-  
-    model_lasso_2 <- cv.glmnet(x = binary_data, y = binary_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
+    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
+    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
     
-    train_predictions <- predict(model_lasso_2, newx = binary_test_data, type = "response")
-    #train_predictions
+    model_lasso_2 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
     
+    #训练集预测概率
+    train_predictions <- predict(model_lasso_2, newx = binary_train_data, type = "response")
     results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
-    #results
     
-    # 查看模型预测准确率
+    # 查看模型在训练集上的预测准确率
+    print("train 2:")
+    print(mean(binary_train_results == results))
+    mean_train_2 <- mean_train_2 + mean(binary_train_results == results)
+    
+    
+    #验证集预测概率
+    validate_predictions <- predict(model_lasso_2, newx = binary_validate_data, type = "response")
+    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
+    
+    # 查看模型在验证集上的预测准确率
     print("validate 2:")
-    print(mean(binary_test_results == results))
-    # 查看混淆矩阵
-    #table(actual = binary_test_results, results)
-    
-    #binary_test_results
-    #results
+    print(mean(binary_validate_results == results))
+    mean_validate_2 <- mean_validate_2 + mean(binary_validate_results == results)
   
     
 
     #对3预测
     class_label <- 3
     
-    binary_data <- as.matrix(data_for_class_3_train[,-c(1)])
-    binary_test_data <- as.matrix(data_for_class_3_validate[,-c(1)])
+    binary_train_data <- as.matrix(data_for_class_3_train[,-c(1)])
+    binary_validate_data <- as.matrix(data_for_class_3_validate[,-c(1)])
     
-    binary_results <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
-    #table(binary_results)
-    binary_test_results <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
-    #table(binary_test_results)
-
-    model_lasso_3 <- cv.glmnet(x = binary_data, y = binary_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
+    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
+    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
     
-    train_predictions <- predict(model_lasso_3, newx = binary_test_data, type = "response")
-    #train_predictions
+    model_lasso_3 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
     
+    #训练集预测概率
+    train_predictions <- predict(model_lasso_3, newx = binary_train_data, type = "response")
     results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
-    #results
     
-    # 查看模型预测准确率
+    # 查看模型在训练集上的预测准确率
+    print("train 3:")
+    print(mean(binary_train_results == results))
+    mean_train_3 <- mean_train_3 + mean(binary_train_results == results)
+    
+    
+    #验证集预测概率
+    validate_predictions <- predict(model_lasso_3, newx = binary_validate_data, type = "response")
+    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
+    
+    # 查看模型在验证集上的预测准确率
     print("validate 3:")
-    print(mean(binary_test_results == results))
-    # 查看混淆矩阵
-    #table(actual = binary_test_results, results)
-    
-    #binary_test_results
-    #results
+    print(mean(binary_validate_results == results))
+    mean_validate_3 <- mean_validate_3 + mean(binary_validate_results == results)
 
-  
+  }
 
-  
+  #测试模型
   test_data <- as.matrix(data_for_class_test[,-c(1)])
   test_result <- as.numeric(as.character(data_for_class_test$results)) 
     
@@ -142,19 +149,45 @@ LassoMultiModel <- function(data_for_class_1_train,
     }else if((p3>p1 && p1>p2) || (p3>p2 && p2 > p1)){
       final_type <- 3
     }
-    #final_type
     
     predict_results <- c(predict_results, final_type)
-    #print(predict_results)
+
   }
-    #predict_results
-    mean_final <- mean_final + mean(predict_results == test_result)
-    #predict_results
-    #test_result
-  }
+    
+  predict_results
+  test_result
   
-  print(mean_final / 100)
+  mean_test <- mean(predict_results == test_result)
+  confusion_matrix <- table(actual = test_result, predict_results)
+
+  print("mean_test:")
+  accuracy <- mean_test
+  print(accuracy)
   
-  return(final_confusion_matrix)
+  print("mean_train_1:")
+  accuracy <- mean_train_1 / 100
+  print(accuracy)
+  
+  print("mean_validate_1:")
+  accuracy <- mean_validate_1 / 100
+  print(accuracy)
+  
+  print("mean_train_2:")
+  accuracy <- mean_train_2 / 100
+  print(accuracy)
+  
+  print("mean_validate_2:")
+  accuracy <- mean_validate_2 / 100
+  print(accuracy)
+  
+  print("mean_train_3:")
+  accuracy <- mean_train_3 / 100
+  print(accuracy)
+  
+  print("mean_validate_3:")
+  accuracy <- mean_validate_3 / 100
+  print(accuracy)
+  
+  return(confusion_matrix)
   
 }

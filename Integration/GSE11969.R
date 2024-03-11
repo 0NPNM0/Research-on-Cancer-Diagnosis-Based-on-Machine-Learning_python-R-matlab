@@ -70,7 +70,7 @@ PCA3DFunction(data_all_3)#类别3合成前后图像比较
 
 # 7.使用Lasso回归进行特征选择
 dataset_length <- 17069
-select_feature_number <- 50#从2开始算第一个,这里参数含义是选到第几个
+select_feature_number <- 60#从2开始算第一个,这里参数含义是选到第几个
 dataset <- rbind(data_all_1, data_all_2, data_all_3)
 lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number)
 
@@ -94,8 +94,13 @@ data_for_class_test <- rbind(data_for_class_1[181:200,],data_for_class_2[181:200
 # 9.训练模型,用测试数据进行评估
 
 # （1）人工神经网络拟合模型
-split_number <- 0.3 #训练集:测试集 3:7
-confusion_matrix_ann <- ANNMultiModel(lasso_data, split_number)
+confusion_matrix_ann <- ANNMultiModel(data_for_class_1_train, 
+                                      data_for_class_1_validate,
+                                      data_for_class_2_train, 
+                                      data_for_class_2_validate,
+                                      data_for_class_3_train, 
+                                      data_for_class_3_validate,
+                                      data_for_class_test)
 EvaluationFunction(confusion_matrix_ann)
 
 # （2）Lasso惩罚逻辑回归拟合模型
@@ -116,6 +121,7 @@ confusion_matrix_ridge <- RidgeMultiModel(data_for_class_1_train,
                                           data_for_class_3_train, 
                                           data_for_class_3_validate,
                                           data_for_class_test)
+
 EvaluationFunction(confusion_matrix_ridge)
 
 # （4）Elastic-Net惩罚逻辑回归拟合模型

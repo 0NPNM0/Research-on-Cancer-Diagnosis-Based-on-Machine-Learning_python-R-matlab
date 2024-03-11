@@ -1,89 +1,195 @@
 
 #人工神经网络拟合模型(多元分类)
 
-ANNMultiModel <- function(lasso_data, split_number){
+ANNMultiModel <- function(data_for_class_1_train, 
+                          data_for_class_1_validate,
+                          data_for_class_2_train, 
+                          data_for_class_2_validate,
+                          data_for_class_3_train, 
+                          data_for_class_3_validate,
+                          data_for_class_test){
   
-  #将数据集分成训练集和测试集
-  #set.seed(12345)#保证每次跑的结果都一样
   
-  train_index <- sample(1:nrow(lasso_data), nrow(lasso_data) * split_number)
-  train_data <- lasso_data[train_index, ]
-  train_results <- train_data$results
+  library(glmnet)
   
   
-  test_data <- lasso_data[-train_index, ]
-  test_results <- test_data$results
+  mean_train <- 0.0000
+  mean_train_1 <- 0.0000
+  mean_train_2 <- 0.0000
+  mean_train_3 <- 0.0000
+  mean_validate_1 <- 0.0000
+  mean_validate_2 <- 0.0000
+  mean_validate_3 <- 0.0000
+  mean_test <- 0.0000
   
-  library(nnet)
-  library(pROC)
-  
-  final_confusion_matrix <- matrix(0, nrow = 2, ncol = 2)
-  
-  for(i in 1:500){#重复500次
+  for(i in 1:100){
     
-    # 构建神经网络模型
-    model_ANN <- nnet(results ~ ., data = train_data, method = "nnet",
-                      maxit = 1000, size = 6, decay = 0.01, trace = F)
-    print(coef(model_ANN))
+    #对1预测
+    class_label <- 1
     
-    # 获取模型预测概率
-    threshold <- 0.5
-    train_predictions <- predict(model_ANN, train_data, type = "raw")
-    train_predictions_ann <- as.factor(ifelse(train_predictions >= threshold, 1, 0))
+    binary_train_data <- as.matrix(data_for_class_1_train[,-c(1)])
+    binary_validate_data <- as.matrix(data_for_class_1_validate[,-c(1)])
     
-    # 查看模型预测准确率
-    mean(train_data[,1] == train_predictions_ann)
+    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_1_train$results == class_label, 1, 0)))
+    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_1_validate$results == class_label, 1, 0)))
     
-    # 查看混淆矩阵
-    table(actual = train_data[,1], train_predictions_ann)
-    # 获取模型预测概率
-    prob_ann <- predict(model_ANN, data = train_data, type = "class")
+    model_ann_1 <- nnet(binary_train_results ~ ., data = binary_train_data, method = "nnet",
+                                       maxit = 1000, size = 6, decay = 0.01, trace = F)
     
-    ROC <- roc(response = train_results, predictor = as.numeric(prob_ann))
-    # 绘制ROC曲线
-    plot(ROC,
-         legacy.axes = TRUE,
-         main = "ANN train ROC curve",
-         type = "l",
-         col = "red",
-         lty = 1,
-         print.auc = TRUE,
-         thresholders = "best",
-         print.thres = "best"
-    )
+    #训练集预测概率
+    train_predictions <- predict(model_ann_1, binary_train_data, type = "raw")
+    results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
     
+    # 查看模型在训练集上的预测准确率
+    print("train 1:")
+    print(mean(binary_train_results == results))
+    mean_train_1 <- mean_train_1 + mean(binary_train_results == results)
     
-    # 在测试集上进行预测
-    test_predictions <- predict(model_ANN, test_data, type = "raw")
-    test_predictions_ann <- as.factor(ifelse(test_predictions >= threshold, 1, 0))
+    #验证集预测概率
+    validate_predictions <- predict(model_ann_1, binary_validate_data, type = "raw")
+    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
     
-    # 查看模型预测准确率
-    mean(test_data[,1] == test_predictions_ann)
+    # 查看模型在验证集上的预测准确率
+    print("validate 1:")
+    print(mean(binary_validate_results == results))
+    mean_validate_1 <- mean_validate_1 + mean(binary_validate_results == results)
+
     
-    # 计算混淆矩阵
-    table(actual = test_data[,1], test_predictions_ann)
-    # 获取模型预测概率
-    prob_ann <- predict(model_ANN, newdata = test_data, type = "class")
-    ROC <- roc(response = test_results, predictor = as.numeric(prob_ann))
-    # 绘制ROC曲线
-    plot(ROC,
-         legacy.axes = TRUE,
-         main = "ANN test ROC curve",
-         type = "l",
-         col = "red",
-         lty = 1,
-         print.auc = TRUE,
-         thresholders = "best",
-         print.thres = "best"
-    )
+    #对2预测
+    class_label <- 2
+    
+    binary_train_data <- as.matrix(data_for_class_2_train[,-c(1)])
+    binary_validate_data <- as.matrix(data_for_class_2_validate[,-c(1)])
+    
+    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
+    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
+    
+    model_ann_2 <- nnet(binary_train_results ~ ., data = binary_train_data, method = "nnet",
+                        maxit = 1000, size = 6, decay = 0.01, trace = F)
+    
+    #训练集预测概率
+    train_predictions <- predict(model_ann_2, binary_train_data, type = "raw")
+    results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
+    
+    # 查看模型在训练集上的预测准确率
+    print("train 2:")
+    print(mean(binary_train_results == results))
+    mean_train_2 <- mean_train_2 + mean(binary_train_results == results)
     
     
-    # 合并混淆矩阵
-    final_confusion_matrix <- final_confusion_matrix + table(actual = test_data[,1], test_predictions_ann)
+    #验证集预测概率
+    validate_predictions <- predict(model_ann_2, binary_validate_data, type = "raw")
+    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
     
+    # 查看模型在验证集上的预测准确率
+    print("validate 2:")
+    print(mean(binary_validate_results == results))
+    mean_validate_2 <- mean_validate_2 + mean(binary_validate_results == results)
+    
+    
+    
+    #对3预测
+    class_label <- 3
+    
+    binary_train_data <- as.matrix(data_for_class_3_train[,-c(1)])
+    binary_validate_data <- as.matrix(data_for_class_3_validate[,-c(1)])
+    
+    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
+    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
+    
+    model_ann_3 <- nnet(binary_train_results ~ ., data = binary_train_data, method = "nnet",
+                        maxit = 1000, size = 6, decay = 0.01, trace = F)
+    
+    #训练集预测概率
+    train_predictions <- predict(model_ann_3, binary_train_data, type = "raw")
+    results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
+    
+    # 查看模型在训练集上的预测准确率
+    print("train 3:")
+    print(mean(binary_train_results == results))
+    mean_train_3 <- mean_train_3 + mean(binary_train_results == results)
+    
+    
+    #验证集预测概率
+    validate_predictions <- predict(model_ann_3, binary_validate_data, type = "raw")
+    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
+    
+    # 查看模型在验证集上的预测准确率
+    print("validate 3:")
+    print(mean(binary_validate_results == results))
+    mean_validate_3 <- mean_validate_3 + mean(binary_validate_results == results)
     
   }
   
+  #测试模型
+  test_data <- as.matrix(data_for_class_test[,-c(1)])
+  test_result <- as.numeric(as.character(data_for_class_test$results)) 
   
-  return(final_confusion_matrix)
+  test_predictions_1 <- predict(model_lasso_1, newx = test_data, type = "response")
+  test_predictions_1
+  
+  test_predictions_2 <- predict(model_lasso_2, newx = test_data, type = "response")
+  test_predictions_2
+  
+  test_predictions_3 <- predict(model_lasso_3, newx = test_data, type = "response")
+  test_predictions_3
+  
+  type <- 1
+  predict_results <- c()
+  for(i in 1:nrow(data_for_class_test)){
+    p1 = test_predictions_1[i]#p:prediction
+    #p1
+    p2 = test_predictions_2[i]
+    #p2
+    p3 = test_predictions_3[i]
+    #p3
+    
+    if((p1>p2 && p2>p3) || (p1>p3 && p3 > p2)){
+      final_type <- 1
+    }else if((p2>p1 && p1>p3) || (p2>p3 && p3 > p1)){
+      final_type <- 2
+    }else if((p3>p1 && p1>p2) || (p3>p2 && p2 > p1)){
+      final_type <- 3
+    }
+    
+    predict_results <- c(predict_results, final_type)
+    
+  }
+  
+  predict_results
+  test_result
+  
+  mean_test <- mean(predict_results == test_result)
+  confusion_matrix <- table(actual = test_result, predict_results)
+  
+  print("mean_test:")
+  accuracy <- mean_test
+  print(accuracy)
+  
+  print("mean_train_1:")
+  accuracy <- mean_train_1 / 100
+  print(accuracy)
+  
+  print("mean_validate_1:")
+  accuracy <- mean_validate_1 / 100
+  print(accuracy)
+  
+  print("mean_train_2:")
+  accuracy <- mean_train_2 / 100
+  print(accuracy)
+  
+  print("mean_validate_2:")
+  accuracy <- mean_validate_2 / 100
+  print(accuracy)
+  
+  print("mean_train_3:")
+  accuracy <- mean_train_3 / 100
+  print(accuracy)
+  
+  print("mean_validate_3:")
+  accuracy <- mean_validate_3 / 100
+  print(accuracy)
+  
+  return(confusion_matrix)
+
 }
