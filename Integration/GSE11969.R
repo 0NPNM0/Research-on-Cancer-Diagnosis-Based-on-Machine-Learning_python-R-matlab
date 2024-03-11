@@ -9,8 +9,8 @@ source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Data 
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Feature Selection\\lasso_regression.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\ANN_multi.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Lasso_multi.R")
-source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Ridge.R")
-source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Elastic_net.R")
+source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Ridge_multi.R")
+source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Elastic_net_multi.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Evaluation\\Evaluation.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Plots\\pca_3d.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Data Synthesis\\SMOTE.R")
@@ -74,22 +74,24 @@ select_feature_number <- 50#从2开始算第一个,这里参数含义是选到�
 dataset <- rbind(data_all_1, data_all_2, data_all_3)
 lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number)
 
+
+# 8.数据划分 训练:验证:测试-> 7:2:1
 data_for_class_1 <- lasso_data[lasso_data$results == 1, ]
 data_for_class_2 <- lasso_data[lasso_data$results == 2, ]
 data_for_class_3 <- lasso_data[lasso_data$results == 3, ]
 
-data_for_class_1_train <- rbind(data_for_class_1[1:180,],data_for_class_2[1:90,],data_for_class_3[1:90,])
-data_for_class_1_validate <- rbind(data_for_class_1[181:210,],data_for_class_2[91:105,],data_for_class_3[91:105,])
+data_for_class_1_train <- rbind(data_for_class_1[1:140,],data_for_class_2[1:70,],data_for_class_3[1:70,])#为什么这里选180:选140预测率低于90%
+data_for_class_1_validate <- rbind(data_for_class_1[141:180,],data_for_class_2[71:90,],data_for_class_3[71:90,])
 
 data_for_class_2_train <- rbind(data_for_class_2[1:140,],data_for_class_1[1:70,],data_for_class_3[1:70,])
-data_for_class_2_validate <- rbind(data_for_class_2[141:170,],data_for_class_1[71:85,],data_for_class_3[71:85,])
+data_for_class_2_validate <- rbind(data_for_class_2[141:180,],data_for_class_1[71:90,],data_for_class_3[71:90,])
 
 data_for_class_3_train <- rbind(data_for_class_3[1:140,],data_for_class_1[1:70,],data_for_class_2[1:70,])
-data_for_class_3_validate <- rbind(data_for_class_3[141:170,],data_for_class_1[71:85,],data_for_class_2[71:85,])
+data_for_class_3_validate <- rbind(data_for_class_3[141:180,],data_for_class_1[71:90,],data_for_class_2[71:90,])
 
-data_for_class_test <- rbind(data_for_class_1[211:240,],data_for_class_2[171:200,],data_for_class_3[171:200,])
+data_for_class_test <- rbind(data_for_class_1[181:200,],data_for_class_2[181:200,],data_for_class_3[181:200,])
   
-# 8.训练模型,用测试数据进行评估
+# 9.训练模型,用测试数据进行评估
 
 # （1）人工神经网络拟合模型
 split_number <- 0.3 #训练集:测试集 3:7
@@ -107,13 +109,23 @@ confusion_matrix_lasso <- LassoMultiModel(data_for_class_1_train,
 EvaluationFunction(confusion_matrix_lasso)
 
 # （3）Ridge惩罚逻辑回归拟合模型
-split_number <- 0.3 #训练集:测试集 3:7
-confusion_matrix_ridge <- RidgeModel(lasso_data, split_number)
+confusion_matrix_ridge <- RidgeMultiModel(data_for_class_1_train, 
+                                          data_for_class_1_validate,
+                                          data_for_class_2_train, 
+                                          data_for_class_2_validate,
+                                          data_for_class_3_train, 
+                                          data_for_class_3_validate,
+                                          data_for_class_test)
 EvaluationFunction(confusion_matrix_ridge)
 
 # （4）Elastic-Net惩罚逻辑回归拟合模型
-split_number <- 0.3 #训练集:测试集 3:7
-confusion_matrix_elastic_net <- ElasticNetModel(lasso_data, split_number)
+confusion_matrix_elastic_net <- ElasticNetMultiModel(data_for_class_1_train, 
+                                                     data_for_class_1_validate,
+                                                     data_for_class_2_train, 
+                                                     data_for_class_2_validate,
+                                                     data_for_class_3_train, 
+                                                     data_for_class_3_validate,
+                                                     data_for_class_test)
 EvaluationFunction(confusion_matrix_elastic_net)
 
 # （5）HLR惩罚逻辑回归拟合模型
