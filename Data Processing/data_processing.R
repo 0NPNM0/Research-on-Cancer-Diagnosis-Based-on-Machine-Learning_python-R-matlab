@@ -12,8 +12,8 @@ DataProcessingFunction <- function(dataset_name,exp,plate,clinical,result_col_na
   exp <- cbind( Symbol = symbol_col_name, exp)
   
   
-  #去除数据头尾空格
-  exp[, grep("Symbol", colnames(exp))] <- trimws(exp[, grep("Symbol", colnames(exp))])
+  #去除数据头尾空格（trimws）
+  exp[, grep("Symbol", colnames(exp))] <- trimws(exp[, grep("Symbol", colnames(exp))])#grep 函数用于在 colnames(exp) 中查找包含字符串 "Symbol" 的列名
   
   #将空白负值NA
   exp[exp==""] <- NA

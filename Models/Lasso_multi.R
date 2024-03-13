@@ -21,7 +21,7 @@ LassoMultiModel <- function(data_for_class_1_train,
   mean_validate_3 <- 0.0000
   mean_test <- 0.0000
   
-  for(i in 1:100){
+  for(i in 1:500){
     
     #对1预测
     class_label <- 1
@@ -165,27 +165,27 @@ LassoMultiModel <- function(data_for_class_1_train,
   print(accuracy)
   
   print("mean_train_1:")
-  accuracy <- mean_train_1 / 100
+  accuracy <- mean_train_1 / 500
   print(accuracy)
   
   print("mean_validate_1:")
-  accuracy <- mean_validate_1 / 100
+  accuracy <- mean_validate_1 / 500
   print(accuracy)
   
   print("mean_train_2:")
-  accuracy <- mean_train_2 / 100
+  accuracy <- mean_train_2 / 500
   print(accuracy)
   
   print("mean_validate_2:")
-  accuracy <- mean_validate_2 / 100
+  accuracy <- mean_validate_2 / 500
   print(accuracy)
   
   print("mean_train_3:")
-  accuracy <- mean_train_3 / 100
+  accuracy <- mean_train_3 / 500
   print(accuracy)
   
   print("mean_validate_3:")
-  accuracy <- mean_validate_3 / 100
+  accuracy <- mean_validate_3 / 500
   print(accuracy)
   
   return(confusion_matrix)

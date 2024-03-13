@@ -2,7 +2,7 @@
 #使用Lasso回归进行特征选择(用于多元分类)
 
 LassoRegressionFunction <- function(dataset, dataset_length,select_feature_number){
-  
+
   y <- as.numeric(dataset[,2])#因变量
   x <- as.matrix(dataset[,3:dataset_length])#自变量
   
@@ -28,12 +28,14 @@ LassoRegressionFunction <- function(dataset, dataset_length,select_feature_numbe
   coef_cv <- data.frame(coef_cv)
   
   coef_cv$OR <- exp(coef_cv$s0)#计算每一个变量的OR值
-  nonzero_vars <- rownames(coef_cv[coef_cv$OR != 1,])
+  nonzero_vars <- coef_cv[coef_cv$OR != 1,]#提取OR不为1的特征
   nonzero_vars
-  nonzero_vars <- nonzero_vars[2:select_feature_number]#去除第一个无关的变量
-  nonzero_vars
+  nonzero_vars_sorted <- rownames(nonzero_vars[order(nonzero_vars$OR, decreasing = TRUE), ])# 按照 OR 大小从大到小排序
+  nonzero_vars_sorted
+  final_nonzero_vars <- nonzero_vars_sorted[2:select_feature_number]#去除第一个无关的变量
+  final_nonzero_vars
   
-  lasso_data <- dataset[,nonzero_vars]
+  lasso_data <- dataset[,final_nonzero_vars]
   lasso_data <- cbind(dataset$results, lasso_data)
   colnames(lasso_data)[1] <- "results"
   

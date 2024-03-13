@@ -21,7 +21,7 @@ RidgeMultiModel <- function(data_for_class_1_train,
   mean_validate_3 <- 0.0000
   mean_test <- 0.0000
   
-  for(i in 1:100){
+  for(i in 1:500){
     
     #对1预测
     class_label <- 1
@@ -123,13 +123,13 @@ RidgeMultiModel <- function(data_for_class_1_train,
   test_data <- as.matrix(data_for_class_test[,-c(1)])
   test_result <- as.numeric(as.character(data_for_class_test$results)) 
   
-  test_predictions_1 <- predict(model_lasso_1, newx = test_data, type = "response")
+  test_predictions_1 <- predict(model_ridge_1, newx = test_data, type = "response")
   test_predictions_1
   
-  test_predictions_2 <- predict(model_lasso_2, newx = test_data, type = "response")
+  test_predictions_2 <- predict(model_ridge_2, newx = test_data, type = "response")
   test_predictions_2
   
-  test_predictions_3 <- predict(model_lasso_3, newx = test_data, type = "response")
+  test_predictions_3 <- predict(model_ridge_3, newx = test_data, type = "response")
   test_predictions_3
   
   type <- 1
@@ -165,27 +165,27 @@ RidgeMultiModel <- function(data_for_class_1_train,
   print(accuracy)
   
   print("mean_train_1:")
-  accuracy <- mean_train_1 / 100
+  accuracy <- mean_train_1 / 500
   print(accuracy)
   
   print("mean_validate_1:")
-  accuracy <- mean_validate_1 / 100
+  accuracy <- mean_validate_1 / 500
   print(accuracy)
   
   print("mean_train_2:")
-  accuracy <- mean_train_2 / 100
+  accuracy <- mean_train_2 / 500
   print(accuracy)
   
   print("mean_validate_2:")
-  accuracy <- mean_validate_2 / 100
+  accuracy <- mean_validate_2 / 500
   print(accuracy)
   
   print("mean_train_3:")
-  accuracy <- mean_train_3 / 100
+  accuracy <- mean_train_3 / 500
   print(accuracy)
   
   print("mean_validate_3:")
-  accuracy <- mean_validate_3 / 100
+  accuracy <- mean_validate_3 / 500
   print(accuracy)
   
   return(confusion_matrix)

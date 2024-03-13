@@ -13,7 +13,7 @@ source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Model
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Elastic_net_multi.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Evaluation\\Evaluation.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Plots\\pca_3d.R")
-source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Data Synthesis\\SMOTE.R")
+source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Data Synthesis\\SMOTE_multi.R")
 
 
 # 2.导入相关的包
@@ -59,18 +59,18 @@ for (i in seq_along(dap$results)) {
 table(dap$results)
 
 # 6.数据合成
-return_data <- SMOTEFunction(dap)#使用smote算法合成数据
+return_data <- SMOTEMultiFunction(dap)#使用smote算法合成数据
 data_all_1 <- return_data$class_data_1
 data_all_2 <- return_data$class_data_2
 data_all_3 <- return_data$class_data_3
-PCA3DFunction(data_all_1)#类别1合成前后图像比较
-PCA3DFunction(data_all_2)#类别2合成前后图像比较
-PCA3DFunction(data_all_3)#类别3合成前后图像比较
+PCA3DFunction(data_all_1, 20)#类别1合成前后图像比较
+PCA3DFunction(data_all_2, 20)#类别2合成前后图像比较
+PCA3DFunction(data_all_3, 20)#类别3合成前后图像比较
 
 
 # 7.使用Lasso回归进行特征选择
 dataset_length <- 17069
-select_feature_number <- 60#从2开始算第一个,这里参数含义是选到第几个
+select_feature_number <- 31#从2开始算第一个,这里参数含义是选到第几个
 dataset <- rbind(data_all_1, data_all_2, data_all_3)
 lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number)
 

@@ -13,6 +13,6 @@ if (!file.exists("GSE11969_eSet.Rdata")) {
                      
   )
   
-  save(GEO_file, file = "GSE11969_eSet.Rdata")#将下载下来的文件保存为我们可以处理的格式
+  save(GEO_file, file = "GSE11969_eSet.Rdata")#将下载下来的文件保存为可以处理的格式
   
 }

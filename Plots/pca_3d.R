@@ -1,7 +1,7 @@
 
 # PCA 3D scatterplot
 
-PCA3DFunction <- function(data_syn){
+PCA3DFunction <- function(data_syn, size){
   
   library(rgl)
   
@@ -25,9 +25,9 @@ PCA3DFunction <- function(data_syn){
          size = 1,
          lwd = 2,
          box = TRUE,
-         xlim = c(-20, 20),
-         ylim = c(-20, 20),
-         zlim = c(-20, 20))
+         xlim = c(-size, size),
+         ylim = c(-size, size),
+         zlim = c(-size, size))
   
 }
 
