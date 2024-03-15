@@ -3,7 +3,7 @@
 
 DataLoadFunction <- function(param){
   
-  filename <- paste("GSE", param, "_eSet.Rdata", sep = "")#sep:无空格
+  filename <- paste("F:/Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python/Data/GSE", param, "_eSet.Rdata", sep = "")#sep:无空格
   load(filename)#将更改好格式并保存好的的数据加载到这里
   
   library(Biobase)

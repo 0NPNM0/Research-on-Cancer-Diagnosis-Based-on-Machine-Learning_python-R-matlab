@@ -25,7 +25,6 @@ result_list <- DataLoadFunction(dataset_name)
 exp <- result_list$exp
 plate <- result_list$plate
 clinical <- result_list$clinical
-table(clinical$characteristics_ch1.7)
 
 
 # 4.数据处理
@@ -37,16 +36,7 @@ dap$results <- trimws(sapply(strsplit(dap$results, ":"), function(x) x[2]))#去�
 dap <- as.data.frame(dap)
 dap <- dap[!dap$results=="NA",, drop=FALSE]#删除值为NA的行
 
-filename <- paste("exp_", dataset_name, ".csv", sep = "")
-write.csv(dap, filename)#保存为csv格式
-savepath <- paste("F:/Graduation thesis/data/exp_", dataset_name, ".csv", sep = "")
-write.csv(dap, file = savepath, row.names = FALSE) 
-
-csvname <- "exp_11969.csv"
-dap <- read.csv(csvname)#已经有该文件的情况下使用，避免重复添加
-
-# 5.多元分类
-for (i in seq_along(dap$results)) {
+for (i in seq_along(dap$results)) {#多元分类
   stage <- dap$results[i]
   if (stage == "IA") dap$results[i] <- 1
   else if (stage == "IB") dap$results[i] <- 1
@@ -58,7 +48,14 @@ for (i in seq_along(dap$results)) {
 
 table(dap$results)
 
-# 6.数据合成
+filename <- paste("F:/Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python/Data/exp_", dataset_name, ".csv", sep = "")
+write.csv(dap, filename)#保存为csv格式
+
+csvname <- "F:/Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python/Data/exp_11969.csv"
+dap <- read.csv(csvname)#已经有该文件的情况下使用，避免重复添加
+
+
+# 5.数据合成
 return_data <- SMOTEMultiFunction(dap)#使用smote算法合成数据
 data_all_1 <- return_data$class_data_1
 data_all_2 <- return_data$class_data_2
@@ -68,19 +65,20 @@ PCA3DFunction(data_all_2, 20)#类别2合成前后图像比较
 PCA3DFunction(data_all_3, 20)#类别3合成前后图像比较
 
 
-# 7.使用Lasso回归进行特征选择
+# 6.使用Lasso回归进行特征选择
 dataset_length <- 17069
 select_feature_number <- 31#从2开始算第一个,这里参数含义是选到第几个
 dataset <- rbind(data_all_1, data_all_2, data_all_3)
-lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number)
+family <- "multinomial" 
+lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number, family)
 
 
-# 8.数据划分 训练:验证:测试-> 7:2:1
+# 7.数据划分 训练:验证:测试-> 7:2:1
 data_for_class_1 <- lasso_data[lasso_data$results == 1, ]
 data_for_class_2 <- lasso_data[lasso_data$results == 2, ]
 data_for_class_3 <- lasso_data[lasso_data$results == 3, ]
 
-data_for_class_1_train <- rbind(data_for_class_1[1:140,],data_for_class_2[1:70,],data_for_class_3[1:70,])#为什么这里选180:选140预测率低于90%
+data_for_class_1_train <- rbind(data_for_class_1[1:140,],data_for_class_2[1:70,],data_for_class_3[1:70,])
 data_for_class_1_validate <- rbind(data_for_class_1[141:180,],data_for_class_2[71:90,],data_for_class_3[71:90,])
 
 data_for_class_2_train <- rbind(data_for_class_2[1:140,],data_for_class_1[1:70,],data_for_class_3[1:70,])
@@ -91,7 +89,7 @@ data_for_class_3_validate <- rbind(data_for_class_3[141:180,],data_for_class_1[7
 
 data_for_class_test <- rbind(data_for_class_1[181:200,],data_for_class_2[181:200,],data_for_class_3[181:200,])
   
-# 9.训练模型,用测试数据进行评估
+# 8.训练模型,用测试数据进行评估
 
 # （1）人工神经网络拟合模型
 confusion_matrix_ann <- ANNMultiModel(data_for_class_1_train, 

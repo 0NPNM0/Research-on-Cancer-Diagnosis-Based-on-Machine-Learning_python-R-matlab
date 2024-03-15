@@ -32,7 +32,8 @@ LassoMultiModel <- function(data_for_class_1_train,
     binary_train_results <- as.numeric(as.character(ifelse(data_for_class_1_train$results == class_label, 1, 0)))
     binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_1_validate$results == class_label, 1, 0)))
   
-    model_lasso_1 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
+    model_lasso1 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
+    model_lasso_1 <- glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, lambda = model_lasso1$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
     train_predictions <- predict(model_lasso_1, newx = binary_train_data, type = "response")
@@ -64,7 +65,8 @@ LassoMultiModel <- function(data_for_class_1_train,
     binary_train_results <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
     binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
     
-    model_lasso_2 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
+    model_lasso2 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
+    model_lasso_2 <- glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, lambda = model_lasso2$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
     train_predictions <- predict(model_lasso_2, newx = binary_train_data, type = "response")
@@ -96,7 +98,8 @@ LassoMultiModel <- function(data_for_class_1_train,
     binary_train_results <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
     binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
     
-    model_lasso_3 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
+    model_lasso3 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
+    model_lasso_3 <- glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 1, lambda = model_lasso3$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
     train_predictions <- predict(model_lasso_3, newx = binary_train_data, type = "response")

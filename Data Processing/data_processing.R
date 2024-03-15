@@ -26,7 +26,7 @@ DataProcessingFunction <- function(dataset_name,exp,plate,clinical,result_col_na
   #将 exp 数据框中小于 0 的值替换为 0
   #exp[exp < 0] <- 0
   
-  #查看列名是否有重复值
+  #查看是否有重复值
   table(duplicated(exp$Symbol))
   
   library(limma)

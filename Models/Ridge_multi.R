@@ -32,7 +32,8 @@ RidgeMultiModel <- function(data_for_class_1_train,
     binary_train_results <- as.numeric(as.character(ifelse(data_for_class_1_train$results == class_label, 1, 0)))
     binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_1_validate$results == class_label, 1, 0)))
     
-    model_ridge_1 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
+    model_ridge1 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
+    model_ridge_1 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, lambda = model_ridge1$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
     train_predictions <- predict(model_ridge_1, newx = binary_train_data, type = "response")
@@ -64,7 +65,8 @@ RidgeMultiModel <- function(data_for_class_1_train,
     binary_train_results <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
     binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
     
-    model_ridge_2 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
+    model_ridge2 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
+    model_ridge_2 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, lambda = model_ridge2$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
     train_predictions <- predict(model_ridge_2, newx = binary_train_data, type = "response")
@@ -96,7 +98,8 @@ RidgeMultiModel <- function(data_for_class_1_train,
     binary_train_results <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
     binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
     
-    model_ridge_3 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
+    model_ridge3 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
+    model_ridge_3 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, lambda = model_ridge3$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
     train_predictions <- predict(model_ridge_3, newx = binary_train_data, type = "response")
