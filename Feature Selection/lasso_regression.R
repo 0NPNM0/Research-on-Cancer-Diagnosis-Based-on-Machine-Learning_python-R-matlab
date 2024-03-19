@@ -1,8 +1,8 @@
 
 #使用Lasso回归进行特征选择(用于多元分类)
 
-LassoRegressionFunction <- function(dataset, dataset_length,select_feature_number,family_multi){
-
+LassoRegressionFunction <- function(dataset, dataset_length,select_feature_number,family){
+  
   y <- as.numeric(dataset[,2])#因变量
   x <- as.matrix(dataset[,3:dataset_length])#自变量
   
@@ -12,7 +12,7 @@ LassoRegressionFunction <- function(dataset, dataset_length,select_feature_numbe
   # 创建Lasso回归模型
   lasso_model <- glmnet(x,
                         y,
-                        family = family_multi,#表示变量为多元分类
+                        family = family,#表示变量为多元分类
                         alpha = 1#采用L1正则化
   )
   print(lasso_model)

@@ -16,8 +16,11 @@ source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Plots
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Data Synthesis\\SMOTE_multi.R")
 
 
+
 # 2.导入相关的包
 loadPackagesFunction
+
+
 
 # 3.加载对应数据集,获取对应返回值
 dataset_name <- 11969
@@ -25,6 +28,7 @@ result_list <- DataLoadFunction(dataset_name)
 exp <- result_list$exp
 plate <- result_list$plate
 clinical <- result_list$clinical
+
 
 
 # 4.数据处理
@@ -55,6 +59,7 @@ csvname <- "F:/Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python/Dat
 dap <- read.csv(csvname)#已经有该文件的情况下使用，避免重复添加
 
 
+
 # 5.数据合成
 return_data <- SMOTEMultiFunction(dap)#使用smote算法合成数据
 data_all_1 <- return_data$class_data_1
@@ -65,6 +70,7 @@ PCA3DFunction(data_all_2, 20)#类别2合成前后图像比较
 PCA3DFunction(data_all_3, 20)#类别3合成前后图像比较
 
 
+
 # 6.使用Lasso回归进行特征选择
 dataset_length <- 17069
 select_feature_number <- 31#从2开始算第一个,这里参数含义是选到第几个
@@ -73,69 +79,102 @@ family <- "multinomial"
 lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number, family)
 
 
-# 7.数据划分 训练:验证:测试-> 7:2:1
-data_for_class_1 <- lasso_data[lasso_data$results == 1, ]
-data_for_class_2 <- lasso_data[lasso_data$results == 2, ]
-data_for_class_3 <- lasso_data[lasso_data$results == 3, ]
 
-data_for_class_1_train <- rbind(data_for_class_1[1:140,],data_for_class_2[1:70,],data_for_class_3[1:70,])
-data_for_class_1_validate <- rbind(data_for_class_1[141:180,],data_for_class_2[71:90,],data_for_class_3[71:90,])
+# 7.dataset数据划分 训练:验证:测试-> 7:2:1
+data_for_class_1_d <- dataset[dataset$results == 1, ]
+data_for_class_2_d <- dataset[dataset$results == 2, ]
+data_for_class_3_d <- dataset[dataset$results == 3, ]
 
-data_for_class_2_train <- rbind(data_for_class_2[1:140,],data_for_class_1[1:70,],data_for_class_3[1:70,])
-data_for_class_2_validate <- rbind(data_for_class_2[141:180,],data_for_class_1[71:90,],data_for_class_3[71:90,])
+data_for_class_1_train_d <- rbind(data_for_class_1_d[1:140,],data_for_class_2_d[1:70,],data_for_class_3_d[1:70,])
+data_for_class_1_validate_d <- rbind(data_for_class_1_d[141:180,],data_for_class_2_d[71:90,],data_for_class_3_d[71:90,])
 
-data_for_class_3_train <- rbind(data_for_class_3[1:140,],data_for_class_1[1:70,],data_for_class_2[1:70,])
-data_for_class_3_validate <- rbind(data_for_class_3[141:180,],data_for_class_1[71:90,],data_for_class_2[71:90,])
+data_for_class_2_train_d <- rbind(data_for_class_2_d[1:140,],data_for_class_1_d[1:70,],data_for_class_3_d[1:70,])
+data_for_class_2_validate_d <- rbind(data_for_class_2_d[141:180,],data_for_class_1_d[71:90,],data_for_class_3_d[71:90,])
 
-data_for_class_test <- rbind(data_for_class_1[181:200,],data_for_class_2[181:200,],data_for_class_3[181:200,])
-  
-# 8.训练模型,用测试数据进行评估
+data_for_class_3_train_d <- rbind(data_for_class_3_d[1:140,],data_for_class_1_d[1:70,],data_for_class_2_d[1:70,])
+data_for_class_3_validate_d <- rbind(data_for_class_3_d[141:180,],data_for_class_1_d[71:90,],data_for_class_2_d[71:90,])
 
-# （1）人工神经网络拟合模型
-confusion_matrix_ann <- ANNMultiModel(data_for_class_1_train, 
-                                      data_for_class_1_validate,
-                                      data_for_class_2_train, 
-                                      data_for_class_2_validate,
-                                      data_for_class_3_train, 
-                                      data_for_class_3_validate,
-                                      data_for_class_test)
-EvaluationFunction(confusion_matrix_ann)
+data_for_class_test_d <- rbind(data_for_class_1_d[181:200,],data_for_class_2_d[181:200,],data_for_class_3_d[181:200,])
 
-# （2）Lasso惩罚逻辑回归拟合模型
-confusion_matrix_lasso <- LassoMultiModel(data_for_class_1_train, 
-                                          data_for_class_1_validate,
-                                          data_for_class_2_train, 
-                                          data_for_class_2_validate,
-                                          data_for_class_3_train, 
-                                          data_for_class_3_validate,
-                                          data_for_class_test)
+
+
+# 8.训练模型,用测试数据进行评估(自带特征选择模型)（使用dataset作为数据集）
+# （1）Lasso惩罚逻辑回归拟合模型
+confusion_matrix_lasso <- LassoMultiModel(data_for_class_1_train_d, 
+                                          data_for_class_1_validate_d,
+                                          data_for_class_2_train_d, 
+                                          data_for_class_2_validate_d,
+                                          data_for_class_3_train_d, 
+                                          data_for_class_3_validate_d,
+                                          data_for_class_test_d)
 EvaluationFunction(confusion_matrix_lasso)
 
-# （3）Ridge惩罚逻辑回归拟合模型
-confusion_matrix_ridge <- RidgeMultiModel(data_for_class_1_train, 
-                                          data_for_class_1_validate,
-                                          data_for_class_2_train, 
-                                          data_for_class_2_validate,
-                                          data_for_class_3_train, 
-                                          data_for_class_3_validate,
-                                          data_for_class_test)
+# （2）Elastic-Net惩罚逻辑回归拟合模型
+confusion_matrix_elastic_net <- ElasticNetMultiModel(data_for_class_1_train_d, 
+                                                     data_for_class_1_validate_d,
+                                                     data_for_class_2_train_d, 
+                                                     data_for_class_2_validate_d,
+                                                     data_for_class_3_train_d, 
+                                                     data_for_class_3_validate_d,
+                                                     data_for_class_test_d)
+EvaluationFunction(confusion_matrix_elastic_net)
+
+# （3）HLR惩罚逻辑回归拟合模型
+confusion_matrix_hlr <- HLRModel()
+EvaluationFunction(confusion_matrix_hlr)
+
+
+
+# 9.lasso_data数据划分 训练:验证:测试-> 7:2:1
+data_for_class_1_l <- lasso_data[lasso_data$results == 1, ]
+data_for_class_2_l <- lasso_data[lasso_data$results == 2, ]
+data_for_class_3_l <- lasso_data[lasso_data$results == 3, ]
+
+data_for_class_1_train_l <- rbind(data_for_class_1_l[1:140,],data_for_class_2_l[1:70,],data_for_class_3_l[1:70,])
+data_for_class_1_validate_l <- rbind(data_for_class_1_l[141:180,],data_for_class_2_l[71:90,],data_for_class_3_l[71:90,])
+
+data_for_class_2_train_l <- rbind(data_for_class_2_l[1:140,],data_for_class_1_l[1:70,],data_for_class_3_l[1:70,])
+data_for_class_2_validate_l <- rbind(data_for_class_2_l[141:180,],data_for_class_1_l[71:90,],data_for_class_3_l[71:90,])
+
+data_for_class_3_train_l <- rbind(data_for_class_3_l[1:140,],data_for_class_1_l[1:70,],data_for_class_2_l[1:70,])
+data_for_class_3_validate_l <- rbind(data_for_class_3_l[141:180,],data_for_class_1_l[71:90,],data_for_class_2_l[71:90,])
+
+data_for_class_test_l <- rbind(data_for_class_1_l[181:200,],data_for_class_2_l[181:200,],data_for_class_3_l[181:200,])
+ 
+
+ 
+# 10.训练模型,用测试数据进行评估(没有特征选择模型)（使用lasso_data作为数据集）
+
+# （1）人工神经网络拟合模型
+confusion_matrix_ann <- ANNMultiModel(data_for_class_1_train_l, 
+                                      data_for_class_1_validate_l,
+                                      data_for_class_2_train_l, 
+                                      data_for_class_2_validate_l,
+                                      data_for_class_3_train_l, 
+                                      data_for_class_3_validate_l,
+                                      data_for_class_test_l)
+EvaluationFunction(confusion_matrix_ann)
+
+# （2）Ridge惩罚逻辑回归拟合模型
+confusion_matrix_ridge <- RidgeMultiModel(data_for_class_1_train_l, 
+                                          data_for_class_1_validate_l,
+                                          data_for_class_2_train_l, 
+                                          data_for_class_2_validate_l,
+                                          data_for_class_3_train_l, 
+                                          data_for_class_3_validate_l,
+                                          data_for_class_test_l)
 
 EvaluationFunction(confusion_matrix_ridge)
 
-# （4）Elastic-Net惩罚逻辑回归拟合模型
-confusion_matrix_elastic_net <- ElasticNetMultiModel(data_for_class_1_train, 
-                                                     data_for_class_1_validate,
-                                                     data_for_class_2_train, 
-                                                     data_for_class_2_validate,
-                                                     data_for_class_3_train, 
-                                                     data_for_class_3_validate,
-                                                     data_for_class_test)
-EvaluationFunction(confusion_matrix_elastic_net)
-
-# （5）HLR惩罚逻辑回归拟合模型
-split_number <- 0.3 #训练集:测试集 3:7
-confusion_matrix_hlr <- HLRModel(lasso_data, split_number)
-EvaluationFunction(confusion_matrix_hlr)
+# （3）朴素贝叶斯分类器模型
+confusion_matrix_nbc <- NaiveBayesMultiModel(data_for_class_1_train_l, 
+                                             data_for_class_1_validate_l,
+                                             data_for_class_2_train_l, 
+                                             data_for_class_2_validate_l,
+                                             data_for_class_3_train_l, 
+                                             data_for_class_3_validate_l,
+                                             data_for_class_test_l)
+EvaluationFunction(confusion_matrix_nbc)
 
 
 

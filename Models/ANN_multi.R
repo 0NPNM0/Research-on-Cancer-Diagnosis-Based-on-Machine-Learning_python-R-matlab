@@ -21,102 +21,109 @@ ANNMultiModel <- function(data_for_class_1_train,
   mean_validate_3 <- 0.0000
   mean_test <- 0.0000
   
+  #对1预测
+  class_label <- 1
+  
+  binary_train_data_1 <- as.matrix(data_for_class_1_train[,-c(1)])
+  binary_validate_data_1 <- as.matrix(data_for_class_1_validate[,-c(1)])
+  
+  binary_train_results_1 <- as.numeric(as.character(ifelse(data_for_class_1_train$results == class_label, 1, 0)))
+  binary_validate_results_1 <- as.numeric(as.character(ifelse(data_for_class_1_validate$results == class_label, 1, 0)))
+  
+  
+  #对2预测
+  class_label <- 2
+  
+  binary_train_data_2 <- as.matrix(data_for_class_2_train[,-c(1)])
+  binary_validate_data_2 <- as.matrix(data_for_class_2_validate[,-c(1)])
+  
+  binary_train_results_2 <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
+  binary_validate_results_2 <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
+  
+  
+  #对3预测
+  class_label <- 3
+  
+  binary_train_data_3 <- as.matrix(data_for_class_3_train[,-c(1)])
+  binary_validate_data_3 <- as.matrix(data_for_class_3_validate[,-c(1)])
+  
+  binary_train_results_3 <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
+  binary_validate_results_3 <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
+  
+  
   for(i in 1:500){
     
-    #对1预测
-    class_label <- 1
-    
-    binary_train_data <- as.matrix(data_for_class_1_train[,-c(1)])
-    binary_validate_data <- as.matrix(data_for_class_1_validate[,-c(1)])
-    
-    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_1_train$results == class_label, 1, 0)))
-    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_1_validate$results == class_label, 1, 0)))
-    
-    model_ann_1 <- nnet(binary_train_results ~ ., data = binary_train_data, method = "nnet",
+    #1
+    model_ann_1 <- nnet(binary_train_results_1 ~ ., data = binary_train_data_1, method = "nnet",
                                        maxit = 1000, size = 6, decay = 0.01, trace = F)
     
     #训练集预测概率
-    train_predictions <- predict(model_ann_1, binary_train_data, type = "raw")
-    results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
+    train_predictions_1 <- predict(model_ann_1, binary_train_data_1, type = "raw")
+    results <- as.numeric(ifelse(train_predictions_1 >0.5, 1, 0))
     
     # 查看模型在训练集上的预测准确率
     print("train 1:")
-    print(mean(binary_train_results == results))
-    mean_train_1 <- mean_train_1 + mean(binary_train_results == results)
+    print(mean(binary_train_results_1 == results))
+    
+    binary_train_results_1
+    results
+    
+    mean_train_1 <- mean_train_1 + mean(binary_train_results_1 == results)
     
     #验证集预测概率
-    validate_predictions <- predict(model_ann_1, binary_validate_data, type = "raw")
-    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
+    validate_predictions_1 <- predict(model_ann_1, binary_validate_data_1, type = "raw")
+    results <- as.numeric(ifelse(validate_predictions_1 >0.5, 1, 0))
     
     # 查看模型在验证集上的预测准确率
     print("validate 1:")
-    print(mean(binary_validate_results == results))
-    mean_validate_1 <- mean_validate_1 + mean(binary_validate_results == results)
+    print(mean(binary_validate_results_1 == results))
+    mean_validate_1 <- mean_validate_1 + mean(binary_validate_results_1 == results)
 
-    
-    #对2预测
-    class_label <- 2
-    
-    binary_train_data <- as.matrix(data_for_class_2_train[,-c(1)])
-    binary_validate_data <- as.matrix(data_for_class_2_validate[,-c(1)])
-    
-    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
-    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
-    
-    model_ann_2 <- nnet(binary_train_results ~ ., data = binary_train_data, method = "nnet",
+    #2
+    model_ann_2 <- nnet(binary_train_results_2 ~ ., data = binary_train_data_2, method = "nnet",
                         maxit = 1000, size = 6, decay = 0.01, trace = F)
     
     #训练集预测概率
-    train_predictions <- predict(model_ann_2, binary_train_data, type = "raw")
-    results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
+    train_predictions_2 <- predict(model_ann_2, binary_train_data_2, type = "raw")
+    results <- as.numeric(ifelse(train_predictions_2 >0.5, 1, 0))
     
     # 查看模型在训练集上的预测准确率
     print("train 2:")
-    print(mean(binary_train_results == results))
-    mean_train_2 <- mean_train_2 + mean(binary_train_results == results)
+    print(mean(binary_train_results_2 == results))
+    mean_train_2 <- mean_train_2 + mean(binary_train_results_2 == results)
     
     
     #验证集预测概率
-    validate_predictions <- predict(model_ann_2, binary_validate_data, type = "raw")
-    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
+    validate_predictions_2 <- predict(model_ann_2, binary_validate_data_2, type = "raw")
+    results <- as.numeric(ifelse(validate_predictions_2 >0.5, 1, 0))
     
     # 查看模型在验证集上的预测准确率
     print("validate 2:")
-    print(mean(binary_validate_results == results))
-    mean_validate_2 <- mean_validate_2 + mean(binary_validate_results == results)
+    print(mean(binary_validate_results_2 == results))
+    mean_validate_2 <- mean_validate_2 + mean(binary_validate_results_2 == results)
     
-    
-    
-    #对3预测
-    class_label <- 3
-    
-    binary_train_data <- as.matrix(data_for_class_3_train[,-c(1)])
-    binary_validate_data <- as.matrix(data_for_class_3_validate[,-c(1)])
-    
-    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
-    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
-    
-    model_ann_3 <- nnet(binary_train_results ~ ., data = binary_train_data, method = "nnet",
+    #3
+    model_ann_3 <- nnet(binary_train_results_3 ~ ., data = binary_train_data_3, method = "nnet",
                         maxit = 1000, size = 6, decay = 0.01, trace = F)
     
     #训练集预测概率
-    train_predictions <- predict(model_ann_3, binary_train_data, type = "raw")
-    results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
+    train_predictions_3 <- predict(model_ann_3, binary_train_data_3, type = "raw")
+    results <- as.numeric(ifelse(train_predictions_3 >0.5, 1, 0))
     
     # 查看模型在训练集上的预测准确率
     print("train 3:")
-    print(mean(binary_train_results == results))
-    mean_train_3 <- mean_train_3 + mean(binary_train_results == results)
+    print(mean(binary_train_results_3 == results))
+    mean_train_3 <- mean_train_3 + mean(binary_train_results_3 == results)
     
     
     #验证集预测概率
-    validate_predictions <- predict(model_ann_3, binary_validate_data, type = "raw")
-    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
+    validate_predictions_3 <- predict(model_ann_3, binary_validate_data_3, type = "raw")
+    results <- as.numeric(ifelse(validate_predictions_3 >0.5, 1, 0))
     
     # 查看模型在验证集上的预测准确率
     print("validate 3:")
-    print(mean(binary_validate_results == results))
-    mean_validate_3 <- mean_validate_3 + mean(binary_validate_results == results)
+    print(mean(binary_validate_results_3 == results))
+    mean_validate_3 <- mean_validate_3 + mean(binary_validate_results_3 == results)
     
   }
   

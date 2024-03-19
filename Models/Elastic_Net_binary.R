@@ -1,14 +1,14 @@
 
 #Elastic-Net惩罚逻辑回归拟合模型
 
-ElasticNetModel <- function(train_data, train_results, test_data,  test_results){
+ElasticNetBinaryModel <- function(train_data, train_results, test_data,  test_results){
   
-  train_matrix <- as.matrix(train_data[, -1])  
-  test_matrix <- as.matrix(test_data[, -1])  
+  train_matrix <- as.matrix(train_data[, -c(1,2)])  
+  test_matrix <- as.matrix(test_data[, -c(1,2)])  
   
   
-  train_results <- as.numeric(as.character(train_data[, 1]))
-  test_results <- as.numeric(as.character(test_data[, 1]))
+  train_results <- as.numeric(as.character(train_data[, 2]))
+  test_results <- as.numeric(as.character(test_data[, 2]))
   
   
   
@@ -17,23 +17,12 @@ ElasticNetModel <- function(train_data, train_results, test_data,  test_results)
   
   for(i in 1:500){#重复100次
     
-    lambdas <- seq(0,5,length.out = 200)
-    
-    # 定义Elastic-Net惩罚逻辑回归模型
-    model <- cv.glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0.5, lambda = lambdas)
-    
-    #查看lambda对均方误差的影响
-    plot(model)
-    #可视化ridge模型回归系数的轨迹线
-    plot(model$glmnet.fit,"lambda",label = T)
-    
-    # 获取最佳正则化参数
-    best_lambda <- model$lambda.min
+    # 定义Lasso惩罚逻辑回归模型
+    model <- cv.glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0.5)
     
     # 使用最佳正则化参数重新拟合模型
-    model_enet <- glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0.5, lambda = best_lambda, standardize = TRUE, type.measure = "class")
-    summary(model_ridge)
-    coef(model_ridge)
+    model_enet <- glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0.5, lambda = model$lambda.min, standardize = TRUE, type.measure = "class")
+  
   }
   
   # 获取模型在训练集上的预测概率

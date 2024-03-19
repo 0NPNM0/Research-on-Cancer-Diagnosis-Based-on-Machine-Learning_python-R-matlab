@@ -1,7 +1,7 @@
 
 #Ridge惩罚逻辑回归拟合模型
 
-RidgeModel <- function(train_data, train_results, test_data,  test_results){
+RidgeBinaryModel <- function(train_data, train_results, test_data,  test_results){
   
   
   train_matrix <- as.matrix(train_data[, -1])  
@@ -17,23 +17,10 @@ RidgeModel <- function(train_data, train_results, test_data,  test_results){
   
   for(i in 1:500){#重复100次
     
-    lambdas <- seq(0,5,length.out = 200)
+    model <- cv.glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0)
     
-    model <- cv.glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0, lambda = lambdas)
-    
-    #查看lambda对均方误差的影响
-    plot(model)
-    #可视化ridge模型回归系数的轨迹线
-    plot(model$glmnet.fit,"lambda",label = T)
-    
-    # 获取最佳正则化参数
-    best_lambda <- model$lambda.min
-    
-    # 使用最佳正则化参数重新拟合模型
-    model_ridge <- glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0, lambda = best_lambda, standardize = TRUE, type.measure = "class")
+    model_ridge <- glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0, lambda = model$lambda.min, standardize = TRUE, type.measure = "class")
 
-    summary(model_ridge)
-    coef(model_ridge)
   }
   
   # 获取模型在训练集上的预测概率

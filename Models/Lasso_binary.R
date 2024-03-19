@@ -1,24 +1,24 @@
 
 #Lasso惩罚逻辑回归拟合模型（二元分类
 
-LassoBinaryModel <- function(train_data, train_results, test_data,  test_results){
+LassoBinaryModel <- function(train_data, train_results, test_data, test_results){
   
-  train_matrix <- as.matrix(train_data[, -1])  
-  test_matrix <- as.matrix(test_data[, -1])  
+  train_matrix <- as.matrix(train_data[, -c(1,2)])  
+  test_matrix <- as.matrix(test_data[, -c(1,2)])  
   
   
-  train_results <- as.numeric(as.character(train_data[, 1]))
-  test_results <- as.numeric(as.character(test_data[, 1]))
+  train_results <- as.numeric(as.character(train_data[, 2]))
+  test_results <- as.numeric(as.character(test_data[, 2]))
   
 
   library(glmnet)
   library(pROC)
   
   
-  for(i in 1:100){#重复100次
+  for(i in 1:5){#重复100次
     
     # 定义Lasso惩罚逻辑回归模型
-    model <- cv.glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 1, lambda = lambdas)
+    model <- cv.glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 1)
     
     # 使用最佳正则化参数重新拟合模型
     model_lasso <- glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 1, lambda = model$lambda.min, standardize = TRUE, type.measure = "class")
@@ -42,7 +42,6 @@ LassoBinaryModel <- function(train_data, train_results, test_data,  test_results
   # 查看模型预测准确率
   print("test:")
   print(mean(test_results == test_predictions_lasso))
-
   
   # 绘制ROC曲线
   ROC <- roc(response = test_results, predictor = as.numeric(test_predictions_lasso))

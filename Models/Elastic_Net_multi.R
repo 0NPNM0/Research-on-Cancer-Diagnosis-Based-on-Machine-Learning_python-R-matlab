@@ -21,19 +21,47 @@ ElasticNetMultiModel <- function(data_for_class_1_train,
   mean_validate_3 <- 0.0000
   mean_test <- 0.0000
   
+  data_for_class_1_train<-data_for_class_1_train_d
+  data_for_class_1_validate<-data_for_class_1_validate_d
+  data_for_class_2_train<-data_for_class_2_train_d
+  data_for_class_2_validate<-data_for_class_2_validate_d
+  data_for_class_3_train<-data_for_class_3_train_d
+  data_for_class_3_validate<-data_for_class_3_validate_d
+  data_for_class_test<-data_for_class_test_d
+  
+  #对1预测
+  class_label <- 1
+  
+  binary_train_data <- as.matrix(data_for_class_1_train[,-c(1)])
+  binary_validate_data <- as.matrix(data_for_class_1_validate[,-c(1)])
+  
+  binary_train_results <- as.numeric(as.character(ifelse(data_for_class_1_train$results == class_label, 1, 0)))
+  binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_1_validate$results == class_label, 1, 0)))
+  
+  #对2预测
+  class_label <- 2
+  
+  binary_train_data <- as.matrix(data_for_class_2_train[,-c(1)])
+  binary_validate_data <- as.matrix(data_for_class_2_validate[,-c(1)])
+  
+  binary_train_results <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
+  binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
+  
+  #对3预测
+  class_label <- 3
+  
+  binary_train_data <- as.matrix(data_for_class_3_train[,-c(1)])
+  binary_validate_data <- as.matrix(data_for_class_3_validate[,-c(1)])
+  
+  binary_train_results <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
+  binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
+  
+  
   for(i in 1:500){
     
-    #对1预测
-    class_label <- 1
-    
-    binary_train_data <- as.matrix(data_for_class_1_train[,-c(1)])
-    binary_validate_data <- as.matrix(data_for_class_1_validate[,-c(1)])
-    
-    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_1_train$results == class_label, 1, 0)))
-    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_1_validate$results == class_label, 1, 0)))
-    
+    #1
     model_enet1 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0.5, standardize = TRUE, type.measure = "class")
-    model_enet_1 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0.5, lambda = model_enet1$lambda.min, standardize = TRUE, type.measure = "class")
+    model_enet_1 <- glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0.5, lambda = model_enet1$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
     train_predictions <- predict(model_enet_1, newx = binary_train_data, type = "response")
@@ -54,19 +82,9 @@ ElasticNetMultiModel <- function(data_for_class_1_train,
     print(mean(binary_validate_results == results))
     mean_validate_1 <- mean_validate_1 + mean(binary_validate_results == results)
     
-    
-    
-    #对2预测
-    class_label <- 2
-    
-    binary_train_data <- as.matrix(data_for_class_2_train[,-c(1)])
-    binary_validate_data <- as.matrix(data_for_class_2_validate[,-c(1)])
-    
-    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
-    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
-    
+    #2
     model_enet2 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0.5, standardize = TRUE, type.measure = "class")
-    model_enet_2 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0.5, lambda = model_enet2$lambda.min, standardize = TRUE, type.measure = "class")
+    model_enet_2 <- glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0.5, lambda = model_enet2$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
     train_predictions <- predict(model_enet_2, newx = binary_train_data, type = "response")
@@ -87,19 +105,9 @@ ElasticNetMultiModel <- function(data_for_class_1_train,
     print(mean(binary_validate_results == results))
     mean_validate_2 <- mean_validate_2 + mean(binary_validate_results == results)
     
-    
-    
-    #对3预测
-    class_label <- 3
-    
-    binary_train_data <- as.matrix(data_for_class_3_train[,-c(1)])
-    binary_validate_data <- as.matrix(data_for_class_3_validate[,-c(1)])
-    
-    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
-    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
-    
+    #3
     model_enet3 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0.5, standardize = TRUE, type.measure = "class")
-    model_enet_3 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0.5, lambda = model_enet3$lambda.min, standardize = TRUE, type.measure = "class")
+    model_enet_3 <- glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0.5, lambda = model_enet3$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
     train_predictions <- predict(model_enet_3, newx = binary_train_data, type = "response")

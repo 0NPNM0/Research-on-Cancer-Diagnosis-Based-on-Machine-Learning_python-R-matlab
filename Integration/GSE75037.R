@@ -14,8 +14,12 @@ source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Evalu
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Plots\\pca_3d.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Data Synthesis\\SMOTE_binary.R")
 
+
+
 # 2.导入相关的包
 loadPackagesFunction
+
+
 
 # 3.加载对应数据集,获取对应返回值
 dataset_name <- 75037
@@ -23,6 +27,8 @@ result_list <- DataLoadFunction(dataset_name)
 exp <- result_list$exp
 plate <- result_list$plate
 clinical <- result_list$clinical
+
+
 
 # 4.数据处理
 result_col_name <- clinical$source_name_ch1
@@ -46,53 +52,66 @@ data_all_0 <- return_data$class_data_0
 PCA3DFunction(data_all_1,100)#类别1合成前后图像比较
 PCA3DFunction(data_all_0,105)#类别0合成前后图像比较
 
+
+
 # 6.使用Lasso回归进行特征选择
 dataset_length <- 25444
 select_feature_number <- 10#这里参数含义是选几个
 dataset <- rbind(data_all_1, data_all_0)
-lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number)
+family <- "binomial"
+lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number, family)
 
 
-# 7.数据划分 训练:测试 7:3
-split_number <- 0.8
-train_index <- sample(1:nrow(lasso_data), nrow(lasso_data) * split_number)
-train_data <- lasso_data[train_index, ]
-train_results <- as.numeric(train_data$results)
 
-test_data <- lasso_data[-train_index, ]
-test_results <- as.numeric(test_data$results)
+# 7.dataset(原数据集)数据划分 训练:测试 7:3
+split_number <- 0.7
+train_index_d <- sample(1:nrow(dataset), nrow(dataset) * split_number)
+train_data_d <- dataset[train_index_d, ]
+train_results_d <- as.numeric(train_data_d$results)
 
-library(caret)
-
-scal <- preProcess(train_data, method = c("center","scale"))#数据标准化
-train_data <- predict(scal, train_data)
-test_data <- predict(scal, test_data)
-scal$mean
-scal$std
+test_data_d <- dataset[-train_index_d, ]
+test_results_d <- as.numeric(test_data_d$results)
 
 
-# 8.训练模型,用测试数据进行评估
 
-# （1）人工神经网络拟合模型
-confusion_matrix_ann <- ANNBinaryModel(train_data, train_results, test_data,  test_results)
-EvaluationFunction(confusion_matrix_ann)
-
-# （2）Lasso惩罚逻辑回归拟合模型
-confusion_matrix_lasso <- LassoBinaryModel(train_data, train_results, test_data,  test_results)
+# 8.训练模型,用测试数据进行评估(自带特征选择模型)（使用dataset作为数据集）
+# （1）Lasso惩罚逻辑回归拟合模型
+confusion_matrix_lasso <- LassoBinaryModel(train_data_d, train_results_d, test_data_d, test_results_d)
 EvaluationFunction(confusion_matrix_lasso)
 
-# （3）Ridge惩罚逻辑回归拟合模型
-confusion_matrix_ridge <- RidgeModel(train_data, train_results, test_data,  test_results)
-EvaluationFunction(confusion_matrix_ridge)
-
-# （4）Elastic-Net惩罚逻辑回归拟合模型
-confusion_matrix_elastic_net <- ElasticNetModel(train_data, train_results, test_data,  test_results)
+# （2）Elastic-Net惩罚逻辑回归拟合模型
+confusion_matrix_elastic_net <- ElasticNetBinaryModel(train_data_d, train_results_d, test_data_d, test_results_d)
 EvaluationFunction(confusion_matrix_elastic_net)
 
-# （5）HLR惩罚逻辑回归拟合模型
-confusion_matrix_hlr <- HLRModel(lasso_data, split_number)
+# （3）HLR惩罚逻辑回归拟合模型
+confusion_matrix_hlr <- HLRModel()
 EvaluationFunction(confusion_matrix_hlr)
 
+
+
+# 9.lasso_data(特征选择出的数据集)数据划分 训练:测试 7:3
+split_number <- 0.7
+train_index_l <- sample(1:nrow(lasso_data), nrow(lasso_data) * split_number)
+train_data_l <- lasso_data[train_index_l, ]
+train_results_l <- as.numeric(train_data_l$results)
+
+test_data_l <- lasso_data[-train_index_l, ]
+test_results_l <- as.numeric(test_data_l$results)
+
+
+
+# 10.训练模型,用测试数据进行评估(没有特征选择模型)（使用lasso_data作为数据集）
+# （1）人工神经网络拟合模型
+confusion_matrix_ann <- ANNBinaryModel(train_data_l, train_results_l, test_data_l, test_results_l)
+EvaluationFunction(confusion_matrix_ann)
+
+# （2）Ridge惩罚逻辑回归拟合模型
+confusion_matrix_ridge <- RidgeBinaryModel(train_data_l, train_results_l, test_data_l, test_results_l)
+EvaluationFunction(confusion_matrix_ridge)
+
+# （3）朴素贝叶斯分类器模型
+confusion_matrix_nbc <- NaiveBayesBinaryModel(train_data_l, train_results_l, test_data_l, test_results_l)
+EvaluationFunction(confusion_matrix_nbc)
 
 
 

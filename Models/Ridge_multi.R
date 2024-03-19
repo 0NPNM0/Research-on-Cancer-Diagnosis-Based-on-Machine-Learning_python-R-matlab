@@ -21,104 +21,104 @@ RidgeMultiModel <- function(data_for_class_1_train,
   mean_validate_3 <- 0.0000
   mean_test <- 0.0000
   
+  #对1预测
+  class_label <- 1
+  
+  binary_train_data_1 <- as.matrix(data_for_class_1_train[,-c(1)])
+  binary_validate_data_1 <- as.matrix(data_for_class_1_validate[,-c(1)])
+  
+  binary_train_results_1 <- as.numeric(as.character(ifelse(data_for_class_1_train_l$results == class_label, 1, 0)))
+  binary_validate_results_1 <- as.numeric(as.character(ifelse(data_for_class_1_validate_l$results == class_label, 1, 0)))
+  
+  #对2预测
+  class_label <- 2
+  
+  binary_train_data_2 <- as.matrix(data_for_class_2_train[,-c(1)])
+  binary_validate_data_2 <- as.matrix(data_for_class_2_validate[,-c(1)])
+  
+  binary_train_results_2 <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
+  binary_validate_results_2 <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
+  
+  #对3预测
+  class_label <- 3
+  
+  binary_train_data_3 <- as.matrix(data_for_class_3_train[,-c(1)])
+  binary_validate_data_3 <- as.matrix(data_for_class_3_validate[,-c(1)])
+  
+  binary_train_results_3 <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
+  binary_validate_results_3 <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
+  
+  
   for(i in 1:500){
     
-    #对1预测
-    class_label <- 1
-    
-    binary_train_data <- as.matrix(data_for_class_1_train[,-c(1)])
-    binary_validate_data <- as.matrix(data_for_class_1_validate[,-c(1)])
-    
-    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_1_train$results == class_label, 1, 0)))
-    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_1_validate$results == class_label, 1, 0)))
-    
-    model_ridge1 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
-    model_ridge_1 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, lambda = model_ridge1$lambda.min, standardize = TRUE, type.measure = "class")
+    #1
+    model_ridge1 <- cv.glmnet(x = binary_train_data_1, y = binary_train_results_1, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
+    model_ridge_1 <- glmnet(x = binary_train_data_1, y = binary_train_results_1, family = "binomial", alpha = 0, lambda = model_ridge1$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
-    train_predictions <- predict(model_ridge_1, newx = binary_train_data, type = "response")
-    results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
+    train_predictions_1 <- predict(model_ridge_1, newx = binary_train_data_1, type = "response")
+    results <- as.numeric(ifelse(train_predictions_1 >0.5, 1, 0))
     
     # 查看模型在训练集上的预测准确率
     print("train 1:")
-    print(mean(binary_train_results == results))
-    mean_train_1 <- mean_train_1 + mean(binary_train_results == results)
+    print(mean(binary_train_results_1 == results))
+    mean_train_1 <- mean_train_1 + mean(binary_train_results_1 == results)
     
     
     #验证集预测概率
-    validate_predictions <- predict(model_ridge_1, newx = binary_validate_data, type = "response")
-    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
+    validate_predictions_1 <- predict(model_ridge_1, newx = binary_validate_data_1, type = "response")
+    results <- as.numeric(ifelse(validate_predictions_1 >0.5, 1, 0))
     
     # 查看模型在验证集上的预测准确率
     print("validate 1:")
-    print(mean(binary_validate_results == results))
-    mean_validate_1 <- mean_validate_1 + mean(binary_validate_results == results)
+    print(mean(binary_validate_results_1 == results))
+    mean_validate_1 <- mean_validate_1 + mean(binary_validate_results_1 == results)
     
-    
-    
-    #对2预测
-    class_label <- 2
-    
-    binary_train_data <- as.matrix(data_for_class_2_train[,-c(1)])
-    binary_validate_data <- as.matrix(data_for_class_2_validate[,-c(1)])
-    
-    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_2_train$results == class_label, 1, 0)))
-    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_2_validate$results == class_label, 1, 0)))
-    
-    model_ridge2 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
-    model_ridge_2 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, lambda = model_ridge2$lambda.min, standardize = TRUE, type.measure = "class")
+    #2
+    model_ridge2 <- cv.glmnet(x = binary_train_data_2, y = binary_train_results_2, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
+    model_ridge_2 <- glmnet(x = binary_train_data_2, y = binary_train_results_2, family = "binomial", alpha = 0, lambda = model_ridge2$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
-    train_predictions <- predict(model_ridge_2, newx = binary_train_data, type = "response")
-    results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
+    train_predictions_2 <- predict(model_ridge_2, newx = binary_train_data_2, type = "response")
+    results <- as.numeric(ifelse(train_predictions_2 >0.5, 1, 0))
     
     # 查看模型在训练集上的预测准确率
     print("train 2:")
-    print(mean(binary_train_results == results))
-    mean_train_2 <- mean_train_2 + mean(binary_train_results == results)
+    print(mean(binary_train_results_2 == results))
+    mean_train_2 <- mean_train_2 + mean(binary_train_results_2 == results)
     
     
     #验证集预测概率
-    validate_predictions <- predict(model_ridge_2, newx = binary_validate_data, type = "response")
-    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
+    validate_predictions_2 <- predict(model_ridge_2, newx = binary_validate_data_2, type = "response")
+    results <- as.numeric(ifelse(validate_predictions_2 >0.5, 1, 0))
     
     # 查看模型在验证集上的预测准确率
     print("validate 2:")
-    print(mean(binary_validate_results == results))
-    mean_validate_2 <- mean_validate_2 + mean(binary_validate_results == results)
+    print(mean(binary_validate_results_2 == results))
+    mean_validate_2 <- mean_validate_2 + mean(binary_validate_results_2 == results)
     
-    
-    
-    #对3预测
-    class_label <- 3
-    
-    binary_train_data <- as.matrix(data_for_class_3_train[,-c(1)])
-    binary_validate_data <- as.matrix(data_for_class_3_validate[,-c(1)])
-    
-    binary_train_results <- as.numeric(as.character(ifelse(data_for_class_3_train$results == class_label, 1, 0)))
-    binary_validate_results <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
-    
-    model_ridge3 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
-    model_ridge_3 <- cv.glmnet(x = binary_train_data, y = binary_train_results, family = "binomial", alpha = 0, lambda = model_ridge3$lambda.min, standardize = TRUE, type.measure = "class")
+    #3
+    model_ridge3 <- cv.glmnet(x = binary_train_data_3, y = binary_train_results_3, family = "binomial", alpha = 0, standardize = TRUE, type.measure = "class")
+    model_ridge_3 <- glmnet(x = binary_train_data_3, y = binary_train_results_3, family = "binomial", alpha = 0, lambda = model_ridge3$lambda.min, standardize = TRUE, type.measure = "class")
     
     #训练集预测概率
-    train_predictions <- predict(model_ridge_3, newx = binary_train_data, type = "response")
-    results <- as.numeric(ifelse(train_predictions >0.5, 1, 0))
+    train_predictions_3 <- predict(model_ridge_3, newx = binary_train_data_3, type = "response")
+    results <- as.numeric(ifelse(train_predictions_3 >0.5, 1, 0))
     
     # 查看模型在训练集上的预测准确率
     print("train 3:")
-    print(mean(binary_train_results == results))
-    mean_train_3 <- mean_train_3 + mean(binary_train_results == results)
+    print(mean(binary_train_results_3 == results))
+    mean_train_3 <- mean_train_3 + mean(binary_train_results_3 == results)
     
     
     #验证集预测概率
-    validate_predictions <- predict(model_ridge_3, newx = binary_validate_data, type = "response")
-    results <- as.numeric(ifelse(validate_predictions >0.5, 1, 0))
+    validate_predictions_3 <- predict(model_ridge_3, newx = binary_validate_data_3, type = "response")
+    results <- as.numeric(ifelse(validate_predictions_3 >0.5, 1, 0))
     
     # 查看模型在验证集上的预测准确率
     print("validate 3:")
-    print(mean(binary_validate_results == results))
-    mean_validate_3 <- mean_validate_3 + mean(binary_validate_results == results)
+    print(mean(binary_validate_results_3 == results))
+    mean_validate_3 <- mean_validate_3 + mean(binary_validate_results_3 == results)
     
   }
   
