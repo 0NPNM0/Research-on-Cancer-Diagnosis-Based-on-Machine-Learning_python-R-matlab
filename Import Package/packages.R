@@ -59,6 +59,10 @@ loadPackagesFunction <- function(){
     
     install.packages("rgl")  #R语言包，用于在三维环境中进行交互式的数据可视化和图形展示
   
+  if(!requireNamespace("naivebayes",quietly = T)) 
+    
+    install.packages("naivebayes") # 安装和加载naivebayes包
+  
   
   
   
@@ -89,5 +93,7 @@ loadPackagesFunction <- function(){
   library(smotefamily)
   
   library(rgl)
+  
+  library(naivebayes)
   
 }

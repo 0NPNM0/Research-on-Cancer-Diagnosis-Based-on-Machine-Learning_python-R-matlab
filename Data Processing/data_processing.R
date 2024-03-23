@@ -15,7 +15,7 @@ DataProcessingFunction <- function(dataset_name,exp,plate,clinical,result_col_na
   #去除数据头尾空格（trimws）
   exp[, grep("Symbol", colnames(exp))] <- trimws(exp[, grep("Symbol", colnames(exp))])#grep 函数用于在 colnames(exp) 中查找包含字符串 "Symbol" 的列名
   
-  #将空白负值NA
+  #将空白赋值NA
   exp[exp==""] <- NA
   
   #从数据框中删除包含缺失值（NA）的行

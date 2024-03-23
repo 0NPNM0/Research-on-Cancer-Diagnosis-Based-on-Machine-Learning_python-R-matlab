@@ -10,10 +10,10 @@ source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Model
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Lasso_binary.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Ridge_binary.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Elastic_net_binary.R")
+source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\NaiveBayes_binary.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Evaluation\\Evaluation.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Plots\\pca_3d.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Data Synthesis\\SMOTE_binary.R")
-
 
 
 # 2.导入相关的包
@@ -56,7 +56,7 @@ PCA3DFunction(data_all_0,105)#类别0合成前后图像比较
 
 # 6.使用Lasso回归进行特征选择
 dataset_length <- 25444
-select_feature_number <- 10#这里参数含义是选几个
+select_feature_number <- 2#这里参数含义是选几个
 dataset <- rbind(data_all_1, data_all_0)
 family <- "binomial"
 lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number, family)
@@ -98,7 +98,11 @@ train_results_l <- as.numeric(train_data_l$results)
 test_data_l <- lasso_data[-train_index_l, ]
 test_results_l <- as.numeric(test_data_l$results)
 
+filename <- paste("F:/Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python/Data/75037_train_data_l.csv", sep = "")
+write.csv(train_data_l, filename)#保存为csv格式
 
+filename <- paste("F:/Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python/Data/75037_test_data_l.csv", sep = "")
+write.csv(test_data_l, filename)#保存为csv格式
 
 # 10.训练模型,用测试数据进行评估(没有特征选择模型)（使用lasso_data作为数据集）
 # （1）人工神经网络拟合模型
@@ -112,8 +116,6 @@ EvaluationFunction(confusion_matrix_ridge)
 # （3）朴素贝叶斯分类器模型
 confusion_matrix_nbc <- NaiveBayesBinaryModel(train_data_l, train_results_l, test_data_l, test_results_l)
 EvaluationFunction(confusion_matrix_nbc)
-
-
 
 
 

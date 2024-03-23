@@ -11,6 +11,7 @@ source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Model
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Lasso_multi.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Ridge_multi.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\Elastic_net_multi.R")
+source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Models\\NaiveBayes_multi.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Evaluation\\Evaluation.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Plots\\pca_3d.R")
 source("F:\\Research-on-Cancer-Diagnosis-Based-on-Machine-Learning_python\\Data Synthesis\\SMOTE_multi.R")
@@ -71,12 +72,36 @@ PCA3DFunction(data_all_3, 20)#类别3合成前后图像比较
 
 
 
+# 6.使用svm进行特征选择
+dataset_length <- 17069
+select_feature_number <- 31#从2开始算第一个,这里参数含义是选到第几个
+dataset <- rbind(data_all_1, data_all_2, data_all_3)
+family <- "multinomial" 
+svm_data <- SVMSelectionFunction(dataset, dataset_length, select_feature_number, family)
+
+
+
 # 6.使用Lasso回归进行特征选择
 dataset_length <- 17069
 select_feature_number <- 31#从2开始算第一个,这里参数含义是选到第几个
 dataset <- rbind(data_all_1, data_all_2, data_all_3)
 family <- "multinomial" 
 lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number, family)
+
+
+#查看数值类型,防止有不是数值的数据
+str(dataset)
+
+results <- dataset[,2]
+dataset_data <- dataset[,-c(1,2)]
+noise_sd <- 0.2
+noisy_data <- dataset_data + rnorm(length(dataset_data), mean = 0, sd = noise_sd)
+
+data_1 <- rbind(dataset_data[1:100,],noisy_data[101:200,])
+data_2 <- rbind(dataset_data[201:300,],noisy_data[301:400,])
+data_3 <- rbind(dataset_data[401:500,],noisy_data[501:600,])
+
+dataset <- cbind(results,rbind(data_1,data_2,data_3))
 
 
 
@@ -167,13 +192,9 @@ confusion_matrix_ridge <- RidgeMultiModel(data_for_class_1_train_l,
 EvaluationFunction(confusion_matrix_ridge)
 
 # （3）朴素贝叶斯分类器模型
-confusion_matrix_nbc <- NaiveBayesMultiModel(data_for_class_1_train_l, 
-                                             data_for_class_1_validate_l,
-                                             data_for_class_2_train_l, 
-                                             data_for_class_2_validate_l,
-                                             data_for_class_3_train_l, 
-                                             data_for_class_3_validate_l,
-                                             data_for_class_test_l)
+nbc_train_data <- rbind(data_for_class_1_l[1:180,],data_for_class_2_l[1:180,],data_for_class_3_l[1:180,])
+nbc_test_data <- rbind(data_for_class_1_l[181:200,],data_for_class_2_l[181:200,],data_for_class_3_l[181:200,])
+confusion_matrix_nbc <- NaiveBayesMultiModel(nbc_train_data,nbc_test_data)
 EvaluationFunction(confusion_matrix_nbc)
 
 

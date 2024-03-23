@@ -15,6 +15,8 @@ ElasticNetBinaryModel <- function(train_data, train_results, test_data,  test_re
   library(glmnet)
   library(pROC)
   
+  mean_train <- 0.0000
+  
   for(i in 1:500){#重复100次
     
     # 定义Lasso惩罚逻辑回归模型
@@ -23,16 +25,20 @@ ElasticNetBinaryModel <- function(train_data, train_results, test_data,  test_re
     # 使用最佳正则化参数重新拟合模型
     model_enet <- glmnet(x = train_matrix, y = train_results, family = "binomial", alpha = 0.5, lambda = model$lambda.min, standardize = TRUE, type.measure = "class")
   
+    # 获取模型在训练集上的预测概率
+    threshold <- 0.5
+    train_predictions <- predict(model_enet, newx = train_matrix, type = "response")
+    train_predictions_enet <- as.factor(ifelse(train_predictions >= threshold, 1, 0))
+    
+    # 查看模型预测准确率
+    print("train:")
+    print(mean(train_results == train_predictions_enet))
+    mean_train <- mean_train + mean(train_results == train_predictions_enet)
   }
   
-  # 获取模型在训练集上的预测概率
-  threshold <- 0.5
-  train_predictions <- predict(model_enet, newx = train_matrix, type = "response")
-  train_predictions_enet <- as.factor(ifelse(train_predictions >= threshold, 1, 0))
-  
-  # 查看模型预测准确率
-  print("train:")
-  print(mean(train_results == train_predictions_enet))
+  print("mean_train:")
+  mean_train <- mean_train / 500
+  print(mean_train)
   
   # 在测试集上进行预测
   threshold <- 0.5

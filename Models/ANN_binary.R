@@ -1,28 +1,35 @@
 
 #人工神经网络拟合模型(二元分类)
 
-ANNBinaryModel <- function(train_data, train_results, test_data,  test_results){
+ANNBinaryModel <- function(train_data, train_results, test_data, test_results){
 
   
   library(nnet)
   library(pROC)
   
+  mean_train <- 0.0000
   
   for(i in 1:500){#重复100次
     
     # 构建神经网络模型
     model_ANN <- nnet(train_results ~ ., data = train_data, method = "nnet",
                       maxit = 1000, size = 6, decay = 0.01, trace = F)
+    
+    # 获取模型在训练集上的预测概率
+    threshold <- 0.5
+    train_predictions <- predict(model_ANN, train_data, type = "raw")
+    train_predictions_ann <- as.factor(ifelse(train_predictions >= threshold, 1, 0))
+    
+    # 查看模型预测准确率
+    print("train:")
+    print(mean(train_results == train_predictions_ann))
+    mean_train <- mean_train + mean(train_results == train_predictions_ann)
   }
   
-  # 获取模型在训练集上的预测概率
-  threshold <- 0.5
-  train_predictions <- predict(model_ANN, train_data, type = "raw")
-  train_predictions_ann <- as.factor(ifelse(train_predictions >= threshold, 1, 0))
-  
   # 查看模型预测准确率
-  print("train:")
-  print(mean(train_results == train_predictions_ann))
+  print("mean_train:")
+  mean_train <- mean_train / 500
+  print(mean_train)
   
   # 在测试集上进行预测
   threshold <- 0.5

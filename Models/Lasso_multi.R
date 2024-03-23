@@ -57,30 +57,31 @@ LassoMultiModel <- function(data_for_class_1_train,
   binary_validate_results_3 <- as.numeric(as.character(ifelse(data_for_class_3_validate$results == class_label, 1, 0)))
   
   
-  for(i in 1:500){
+  #for(i in 1:500){
     
     #1
     model_lasso1 <- cv.glmnet(x = binary_train_data_1, y = binary_train_results_1, family = "binomial", alpha = 1, standardize = TRUE, type.measure = "class")
-    model_lasso_1 <- glmnet(x = binary_train_data_1, y = binary_train_results_1, family = "binomial", alpha = 1, lambda = model_lasso1$lambda.min, standardize = TRUE, type.measure = "class")
+    model_lasso_1 <- glmnet(x = binary_train_data_1, y = binary_train_results_1, family = "binomial", alpha = 1, lambda = model_lasso1$lambda.min, standardize = TRUE, 
+                            type.measure = "class")
     
     #训练集预测概率
     train_predictions_1 <- predict(model_lasso_1, newx = binary_train_data_1, type = "response")
-    results <- as.numeric(ifelse(train_predictions_1 >0.5, 1, 0))
+    results_1 <- as.numeric(ifelse(train_predictions_1 >0.5, 1, 0))
     
     # 查看模型在训练集上的预测准确率
     print("train 1:")
-    print(mean(binary_train_results_1 == results))
-    mean_train_1 <- mean_train_1 + mean(binary_train_results_1 == results)
+    print(mean(binary_train_results_1 == results_1))
+    mean_train_1 <- mean_train_1 + mean(binary_train_results_1 == results_1)
     
     
     #验证集预测概率
     validate_predictions_1 <- predict(model_lasso_1, newx = binary_validate_data_1, type = "response")
-    results <- as.numeric(ifelse(validate_predictions_1 >0.5, 1, 0))
+    results_1 <- as.numeric(ifelse(validate_predictions_1 >0.5, 1, 0))
     
     # 查看模型在验证集上的预测准确率
     print("validate 1:")
-    print(mean(binary_validate_results_1 == results))
-    mean_validate_1 <- mean_validate_1 + mean(binary_validate_results_1 == results)
+    print(mean(binary_validate_results_1 == results_1))
+    mean_validate_1 <- mean_validate_1 + mean(binary_validate_results_1 == results_1)
     
     
     #2
@@ -89,22 +90,22 @@ LassoMultiModel <- function(data_for_class_1_train,
     
     #训练集预测概率
     train_predictions_2 <- predict(model_lasso_2, newx = binary_train_data_2, type = "response")
-    results <- as.numeric(ifelse(train_predictions_2 >0.5, 1, 0))
+    results_2 <- as.numeric(ifelse(train_predictions_2 >0.5, 1, 0))
     
     # 查看模型在训练集上的预测准确率
     print("train 2:")
-    print(mean(binary_train_results_2 == results))
-    mean_train_2 <- mean_train_2 + mean(binary_train_results_2 == results)
+    print(mean(binary_train_results_2 == results_2))
+    mean_train_2 <- mean_train_2 + mean(binary_train_results_2 == results_2)
     
     
     #验证集预测概率
     validate_predictions_2 <- predict(model_lasso_2, newx = binary_validate_data_2, type = "response")
-    results <- as.numeric(ifelse(validate_predictions_2 >0.5, 1, 0))
+    results_2 <- as.numeric(ifelse(validate_predictions_2 >0.5, 1, 0))
     
     # 查看模型在验证集上的预测准确率
     print("validate 2:")
-    print(mean(binary_validate_results_2 == results))
-    mean_validate_2 <- mean_validate_2 + mean(binary_validate_results_2 == results)
+    print(mean(binary_validate_results_2 == results_2))
+    mean_validate_2 <- mean_validate_2 + mean(binary_validate_results_2 == results_2)
   
     
 
@@ -114,37 +115,41 @@ LassoMultiModel <- function(data_for_class_1_train,
     
     #训练集预测概率
     train_predictions_3 <- predict(model_lasso_3, newx = binary_train_data_3, type = "response")
-    results <- as.numeric(ifelse(train_predictions_3 >0.5, 1, 0))
+    results_3 <- as.numeric(ifelse(train_predictions_3 >0.5, 1, 0))
     
     # 查看模型在训练集上的预测准确率
     print("train 3:")
-    print(mean(binary_train_results_3 == results))
-    mean_train_3 <- mean_train_3 + mean(binary_train_results_3 == results)
+    print(mean(binary_train_results_3 == results_3))
+    mean_train_3 <- mean_train_3 + mean(binary_train_results_3 == results_3)
     
     
     #验证集预测概率
     validate_predictions_3 <- predict(model_lasso_3, newx = binary_validate_data_3, type = "response")
-    results <- as.numeric(ifelse(validate_predictions_3 >0.5, 1, 0))
+    results_3 <- as.numeric(ifelse(validate_predictions_3 >0.5, 1, 0))
     
     # 查看模型在验证集上的预测准确率
     print("validate 3:")
-    print(mean(binary_validate_results_3 == results))
-    mean_validate_3 <- mean_validate_3 + mean(binary_validate_results_3 == results)
+    print(mean(binary_validate_results_3 == results_3))
+    mean_validate_3 <- mean_validate_3 + mean(binary_validate_results_3 == results_3)
 
-  }
+  #}
 
   #测试模型
   test_data <- as.matrix(data_for_class_test[,-c(1)])
+  
   test_result <- as.numeric(as.character(data_for_class_test$results)) 
     
   test_predictions_1 <- predict(model_lasso_1, newx = test_data, type = "response")
   test_predictions_1
   
+  
   test_predictions_2 <- predict(model_lasso_2, newx = test_data, type = "response")
   test_predictions_2
   
+  
   test_predictions_3 <- predict(model_lasso_3, newx = test_data, type = "response")
   test_predictions_3
+  
   
   type <- 1
   predict_results <- c()

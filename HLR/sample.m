@@ -31,5 +31,4 @@ clc
 
 %%%%%%%%%%% HLX with logistic regression %%%%%%%%%%%%%%%%%%%%%%%%
          %alpha=[0.01:0.01:1];
-       [beta_path,info] = HLX_Regularization(x1,y1,'binomial',...
-            'NumLambda',100,'Alpha',0.25);
+       [beta_path,info] = HLR_Regularization(x1,y1,'binomial','NumLambda',100,'Alpha',0.25);

@@ -1,4 +1,4 @@
-function [B,stats] = HLX_Regularization(x,y,distr,varargin)
+function [B,stats] = HLR_Regularization(x,y,distr,varargin)
 
 
 
