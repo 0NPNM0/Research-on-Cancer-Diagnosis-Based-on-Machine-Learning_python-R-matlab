@@ -58,7 +58,7 @@ PCA3DFunction(data_all_0,105)#类别0合成前后图像比较
 dataset_length <- 25444
 select_feature_number <- 2#这里参数含义是选几个
 dataset <- rbind(data_all_1, data_all_0)
-family <- "binomial"
+family <- "gaussian"
 lasso_data <- LassoRegressionFunction(dataset, dataset_length, select_feature_number, family)
 
 
